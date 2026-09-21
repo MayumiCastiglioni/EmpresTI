@@ -1,4 +1,4 @@
-# --- Dependencias ---
+# --- Dependências ---
 /node_modules
 /.pnp
 .pnp.js
@@ -6,12 +6,12 @@
 # --- Vercel ---
 .vercel
 
-# --- Supabase CLIG (credenciales y estado local) ---
+# --- Supabase CLI (credenciais e estado local) ---
 supabase/.temp
 supabase/.branches
 supabase/.env
 
-# --- Variables de entorno (NUNCA subir) ---
+# --- Variáveis de ambiente (NUNCA subir) ---
 .env
 .env.local
 .env.*.local
