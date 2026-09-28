@@ -1,0 +1,36 @@
+# --- Dependências ---
+/node_modules
+/.pnp
+.pnp.js
+
+# --- Vercel ---
+.vercel
+
+# --- Supabase CLI (credenciais e estado local) ---
+supabase/.temp
+supabase/.branches
+supabase/.env
+
+# --- Variáveis de ambiente (NUNCA subir) ---
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# --- Next.js / Node ---
+.next
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# --- Logs / SO ---
+*.log
+.DS_Store
+Thumbs.db
+
+# --- IDE ---
+.vscode/*
+!.vscode/extensions.json
+.idea
