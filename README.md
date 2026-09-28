@@ -13,14 +13,15 @@ Sistema de controle de **empréstimo de equipamentos**: registra quem está com 
 | Estilização | Tailwind CSS + shadcn/ui |
 | Deploy | Vercel |
 
-> Decisões detalhadas em [docs/adr/001-stack.md](docs/adr/001-stack.md).
+> Decisões detalhadas em [docs/arquitetura/decisoes/001-stack.md](docs/arquitetura/decisoes/001-stack.md).
 
 ## Estrutura
 
 ```
-docs/          — PRD, decisões de arquitetura (ADR) e perguntas em aberto
-supabase/      — configuração local do Supabase (config.toml, migrações)
-.env.example   — modelo de variáveis de ambiente (copie para .env.local)
+docs/produto/                       — perguntas em aberto para definir o produto
+docs/arquitetura/decisoes/           — decisões de arquitetura (ADR)
+supabase/                            — configuração local do Supabase e migrações
+.env.example                         — modelo de variáveis de ambiente (copie para .env.local)
 ```
 
 ## Configuração inicial

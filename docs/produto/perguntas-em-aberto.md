@@ -1,4 +1,4 @@
-# Cinco perguntas que o PRD não responde
+# Perguntas em aberto do produto
 
 ---
 
