@@ -1,13 +1,17 @@
 {
-  "name": "future",
+  "name": "empresti",
   "version": "1.0.0",
-  "description": "",
+  "description": "Gestão de empréstimos de equipamentos.",
   "main": "index.js",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "test": "echo \"Testes ainda não configurados\""
   },
   "repository": {
     "type": "git",
@@ -23,6 +27,21 @@
   "homepage": "https://github.com/GiovannaRosaN/empresTI#readme",
   "dependencies": {
     "@prisma/client": "^7.10.0",
-    "prisma": "^8.0.0-rc.17"
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.2",
+    "dotenv": "^18.0.5",
+    "lucide-react": "^1.50.0",
+    "next": "^16.3.8",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.8",
+    "prisma": "^7.10.0",
+    "typescript": "^6.0.3"
   }
 }
