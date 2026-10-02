@@ -18,6 +18,7 @@ Sistema de controle de **empréstimo de equipamentos**: registra quem está com 
 ## Estrutura
 
 ```
+app/                                 — interface web (Next.js App Router)
 docs/produto/                       — perguntas em aberto para definir o produto
 docs/arquitetura/decisoes/           — decisões de arquitetura (ADR)
 supabase/                            — configuração local do Supabase e migrações
@@ -26,9 +27,13 @@ supabase/                            — configuração local do Supabase e migr
 
 ## Configuração inicial
 
-1. Instale as dependências com `npm install` (quando o código da aplicação existir).
+1. Instale as dependências com `npm install`.
 2. Copie `.env.example` para `.env.local` e preencha as chaves do Supabase.
 3. Conecte a CLI ao projeto remoto: `supabase link --project-ref <REF>`.
+
+## Desenvolvimento
+
+Execute `npm run dev` e abra `http://localhost:3000`. O painel atual usa dados de demonstração no navegador; as ações ainda não persistem no Supabase.
 
 ## Deploy
 

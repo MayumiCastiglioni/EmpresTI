@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -62,7 +62,7 @@ const navigation: { id: Section; label: string; icon: LucideIcon }[] = [
 const initialEquipment: Equipment[] = [
   { name: "MacBook Pro 14”", code: "EQ-014", category: "Computadores", status: "Emprestado", icon: Laptop, tone: "mint" },
   { name: "Câmera Sony A7 IV", code: "EQ-022", category: "Audiovisual", status: "Emprestado", icon: Camera, tone: "peach" },
-  { name: "Monitor Dell 27”", code: "EQ-008", category: "Monitores", status: "Disponível", icon: Monitor, tone: "blue" },
+  { name: "Monitor Dell 27”", code: "EQ-008", category: "Monitores", status: "Emprestado", icon: Monitor, tone: "blue" },
   { name: "iPad Air 11”", code: "EQ-031", category: "Tablets", status: "Emprestado", icon: Tablet, tone: "lilac" },
   { name: "Fone Sony WH-1000XM5", code: "EQ-019", category: "Acessórios", status: "Disponível", icon: Headphones, tone: "yellow" },
   { name: "Logitech MX Master 3S", code: "EQ-027", category: "Acessórios", status: "Disponível", icon: Package, tone: "mint" },
@@ -105,6 +105,20 @@ function AppLogo() {
   return <div className="brand-mark" aria-hidden="true"><Command size={21} strokeWidth={2.5} /></div>;
 }
 
+const categoryPresentation: Record<string, { icon: LucideIcon; tone: string }> = {
+  Computadores: { icon: Laptop, tone: "mint" },
+  Audiovisual: { icon: Camera, tone: "peach" },
+  Monitores: { icon: Monitor, tone: "blue" },
+  Tablets: { icon: Tablet, tone: "lilac" },
+  Acessórios: { icon: Headphones, tone: "yellow" },
+};
+
+function formatToday() {
+  return new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "2-digit", month: "long" })
+    .format(new Date())
+    .toLocaleUpperCase("pt-BR");
+}
+
 export default function Home() {
   const [section, setSection] = useState<Section>("overview");
   const [loans, setLoans] = useState(initialLoans);
@@ -114,12 +128,41 @@ export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const [toast, setToast] = useState("");
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const closeModalButtonRef = useRef<HTMLButtonElement>(null);
 
   const activeTitle = sectionTitles[section];
   const available = equipment.filter((item) => item.status === "Disponível").length;
   const inUse = equipment.filter((item) => item.status === "Emprestado").length;
   const pending = loans.filter((loan) => loan.status === "Pendente").length;
   const overdue = loans.filter((loan) => loan.status === "Atrasado").length;
+  const reservedCodes = new Set(loans.filter((loan) => loan.status !== "Devolvido").map((loan) => loan.code));
+  const requestableEquipment = equipment.filter((item) => item.status === "Disponível" && !reservedCodes.has(item.code));
+  const categories = Array.from(new Set(equipment.map((item) => item.category))).map((name) => {
+    const items = equipment.filter((item) => item.category === name);
+    return { name, total: items.length, available: items.filter((item) => item.status === "Disponível").length, ...categoryPresentation[name] };
+  });
+
+  useEffect(() => {
+    function focusSearch(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    }
+    window.addEventListener("keydown", focusSearch);
+    return () => window.removeEventListener("keydown", focusSearch);
+  }, []);
+
+  useEffect(() => {
+    if (!modalOpen) return;
+    closeModalButtonRef.current?.focus();
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setModalOpen(false);
+    }
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [modalOpen]);
 
   const filteredLoans = loans.filter((loan) => {
     const matchesQuery = `${loan.person} ${loan.item} ${loan.code} ${loan.id}`.toLowerCase().includes(query.toLowerCase());
@@ -152,16 +195,21 @@ export default function Home() {
     const form = new FormData(event.currentTarget);
     const person = String(form.get("person"));
     const code = String(form.get("equipment"));
+    const dueParts = String(form.get("due")).split("-");
+    const dueMonth = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
     const selected = equipment.find((item) => item.code === code);
     const personInfo = people.find((item) => item.name === person);
-    if (!selected || !personInfo) return;
+    if (!selected || !personInfo || dueParts.length !== 3 || reservedCodes.has(code)) {
+      showToast("Este equipamento não está mais disponível.");
+      return;
+    }
     setLoans((current) => [{
       id: `EM-${1050 + current.length}`,
       person,
       team: personInfo.team,
       item: selected.name,
       code: selected.code,
-      due: "05 out, 2026",
+      due: `${dueParts[2]} ${dueMonth[Number(dueParts[1]) - 1]}, ${dueParts[0]}`,
       status: "Pendente",
       icon: selected.icon,
       tone: selected.tone,
@@ -210,8 +258,8 @@ export default function Home() {
           <div className="topbar-actions">
             <label className="search-box">
               <Search size={16} />
-              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar equipamento ou pessoa" aria-label="Buscar equipamento ou pessoa" />
-              <kbd>⌘ K</kbd>
+              <input ref={searchInputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar equipamento ou pessoa" aria-label="Buscar equipamento ou pessoa" />
+              <kbd>Ctrl/⌘ K</kbd>
             </label>
             <div className="notification-wrap">
               <button className={`icon-button ${notificationsOpen ? "selected" : ""}`} aria-label="Notificações" onClick={() => setNotificationsOpen((open) => !open)}><Bell size={18} /><i /></button>
@@ -224,7 +272,7 @@ export default function Home() {
         <div className="page-content">
           <div className="page-heading">
             <div>
-              <div className="date-label"><CalendarDays size={14} /> SEGUNDA-FEIRA, 28 DE SETEMBRO</div>
+              <div className="date-label"><CalendarDays size={14} /> {formatToday()}</div>
               <h1>{activeTitle.title}<span className="heading-dot">.</span></h1>
               <p>{activeTitle.subtitle}</p>
             </div>
@@ -259,12 +307,7 @@ export default function Home() {
             <section className="content-panel category-panel">
               <div className="panel-heading"><div><h2>Inventário por categoria</h2><p>Distribuição dos itens cadastrados</p></div><button className="icon-plain" aria-label="Filtrar categorias"><SlidersHorizontal size={17} /></button></div>
               <div className="category-list">
-                {[
-                  { name: "Computadores", count: 3, total: 4, icon: Laptop, tone: "mint" },
-                  { name: "Audiovisual", count: 2, total: 3, icon: Camera, tone: "peach" },
-                  { name: "Monitores", count: 1, total: 3, icon: Monitor, tone: "blue" },
-                  { name: "Acessórios", count: 2, total: 4, icon: Headphones, tone: "yellow" },
-                ].map(({ name, count, total, icon: Icon, tone }) => <div className="category-row" key={name}><div className={`category-icon ${tone}`}><Icon size={17} /></div><div className="category-name">{name}<span>{count} disponíveis</span></div><div className="category-meter"><i style={{ width: `${(count / total) * 100}%` }} /></div><strong>{total.toString().padStart(2, "0")}</strong></div>)}
+                {categories.map(({ name, available: count, total, icon: Icon, tone }) => <div className="category-row" key={name}><div className={`category-icon ${tone}`}><Icon size={17} /></div><div className="category-name">{name}<span>{count} disponíveis</span></div><div className="category-meter"><i style={{ width: `${(count / total) * 100}%` }} /></div><strong>{total.toString().padStart(2, "0")}</strong></div>)}
               </div>
               <button className="attention-link" onClick={() => setSection("equipment")}>Ver inventário completo <ArrowUpRight size={14} /></button>
             </section>
@@ -284,7 +327,7 @@ export default function Home() {
         <footer className="app-footer"><span>Emprest <b>·</b> Inventário e empréstimos</span><span>Feito para cuidar do que é compartilhado.</span></footer>
       </main>
 
-      {modalOpen && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setModalOpen(false); }}><section className="request-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div className="modal-heading"><div><span className="modal-kicker">NOVO PEDIDO</span><h2 id="modal-title">Solicitar equipamento</h2><p>Escolha quem precisa e qual item será solicitado.</p></div><button className="icon-button" onClick={() => setModalOpen(false)} aria-label="Fechar"><X size={18} /></button></div><form onSubmit={addRequest}><label>Pessoa<select name="person" required defaultValue=""><option value="" disabled>Selecione uma pessoa</option>{people.map((person) => <option key={person.name}>{person.name}</option>)}</select></label><label>Equipamento<select name="equipment" required defaultValue=""><option value="" disabled>Selecione um item disponível</option>{equipment.filter((item) => item.status === "Disponível").map((item) => <option key={item.code} value={item.code}>{item.name} · {item.code}</option>)}</select></label><label>Data prevista para devolução<input name="due" type="date" defaultValue="2026-10-05" required /></label><div className="modal-actions"><button type="button" className="secondary-button" onClick={() => setModalOpen(false)}>Cancelar</button><button type="submit" className="primary-button"><Plus size={16} /> Criar solicitação</button></div></form></section></div>}
+      {modalOpen && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setModalOpen(false); }}><section className="request-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div className="modal-heading"><div><span className="modal-kicker">NOVO PEDIDO</span><h2 id="modal-title">Solicitar equipamento</h2><p>Escolha quem precisa e qual item será solicitado.</p></div><button ref={closeModalButtonRef} className="icon-button" onClick={() => setModalOpen(false)} aria-label="Fechar"><X size={18} /></button></div><form onSubmit={addRequest}><label>Pessoa<select name="person" required defaultValue=""><option value="" disabled>Selecione uma pessoa</option>{people.map((person) => <option key={person.name}>{person.name}</option>)}</select></label><label>Equipamento<select name="equipment" required defaultValue=""><option value="" disabled>Selecione um item disponível</option>{requestableEquipment.map((item) => <option key={item.code} value={item.code}>{item.name} · {item.code}</option>)}</select></label><label>Data prevista para devolução<input name="due" type="date" defaultValue="2026-10-05" required /></label><div className="modal-actions"><button type="button" className="secondary-button" onClick={() => setModalOpen(false)}>Cancelar</button><button type="submit" className="primary-button"><Plus size={16} /> Criar solicitação</button></div></form></section></div>}
       {toast && <div className="toast"><span className="toast-check"><Check size={15} /></span>{toast}</div>}
     </div>
   );
