@@ -1,6 +1,17 @@
+"use client";
+
+import { type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowRight, Package, ShieldCheck } from "lucide-react";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  function enterCatalog(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    router.push("/catalogo");
+  }
+
   return (
     <main className="login-screen" data-screen-label="01 Login">
       <section className="login-hero" aria-labelledby="login-hero-title">
@@ -45,16 +56,16 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <form className="login-form">
+          <form className="login-form" onSubmit={enterCatalog}>
             <label htmlFor="email">
               E-mail
-              <input id="email" name="email" type="email" autoComplete="email" placeholder="nome@empresa.com" />
+              <input id="email" name="email" type="text" autoComplete="email" placeholder="nome@empresa.com" />
             </label>
             <label htmlFor="password">
               Senha
               <input id="password" name="password" type="password" autoComplete="current-password" placeholder="Sua senha" />
             </label>
-            <button className="login-submit" type="button" aria-describedby="login-setup-note">
+            <button className="login-submit" type="submit" aria-describedby="login-setup-note">
               Entrar
               <ArrowRight size={17} strokeWidth={2} aria-hidden="true" />
             </button>
@@ -62,7 +73,7 @@ export default function LoginPage() {
 
           <div className="login-rule login-rule-form" aria-hidden="true" />
           <p className="login-setup-note" id="login-setup-note">
-            A autenticação está em configuração. Para receber acesso, fale com Operações.
+            A autenticação ainda não está finalizada.
           </p>
         </div>
       </section>
