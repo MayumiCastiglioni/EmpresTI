@@ -1,4 +1,67 @@
-# Handoff — pendências para transformar o protótipo em produto
+# Handoff — Supabase, Prisma e regras de empréstimo
+
+## Atualização de 2 de outubro de 2026
+
+O commit desta etapa foi criado pelo responsável do projeto. As alterações foram feitas e validadas no repositório local `EmpresTI`; nenhuma alteração foi enviada ao banco Supabase em nuvem.
+
+### Implementado
+
+- Clientes Supabase para navegador e servidor, renovação de sessão por cookies em `utils/supabase/` e integração de borda em `proxy.ts`.
+- Variáveis públicas configuradas em `.env.local` (ignorado pelo Git) e `.env.example` atualizado para a chave publicável.
+- Dependências e scripts para Next.js, React, TypeScript, ESLint, Prisma e Supabase adicionados ao projeto.
+- Modelo Prisma para organizações, vínculos de usuários, equipamentos, empréstimos e auditoria em `prisma/schema.prisma`.
+- Configuração Prisma 7 em `prisma.config.ts` e duas migrações aplicadas ao Supabase local:
+  - `20261002120101_init_inventory`: tipos, tabelas, índices e chaves estrangeiras.
+  - `20261002120200_enforce_inventory_rules`: RLS, permissões e regras de consistência.
+
+### Regras protegidas no banco local
+
+- Isolamento de dados por organização e permissões para membro, Operações e Administrador.
+- Um equipamento não pode ter dois empréstimos ativos.
+- A solicitação reserva o equipamento imediatamente.
+- Limite de três empréstimos ativos por pessoa e bloqueio de novas solicitações em caso de atraso.
+- Fluxo permitido: `SOLICITADO → RETIRADO → DEVOLVIDO` ou `SOLICITADO → CANCELADO`.
+- Devolução danificada ou incompleta transfere automaticamente o item para `MANUTENCAO`.
+
+### Validações executadas
+
+- `npx prisma validate`
+- `npx prisma migrate status` — duas migrações aplicadas e banco local sincronizado.
+- `npx prisma generate`
+- `npx tsc --noEmit`
+- ESLint direcionado aos arquivos alterados, sem erros.
+
+O build do Next.js alcançou a compilação sem diagnóstico de código. O empacotamento não devolveu um status final no ambiente sincronizado pelo OneDrive; repeti-lo em CI ou fora dessa pasta é recomendado.
+
+### Próximos passos
+
+1. Ligar o projeto local ao Supabase remoto, obter uma `DATABASE_URL` direta e aplicar as migrações revisadas ao ambiente em nuvem.
+2. Implementar login e o fluxo seguro de criação inicial de tenant/membership; as políticas RLS assumem que esses registros já existem.
+3. Substituir os dados de demonstração de `app/page.tsx` por consultas e mutações persistidas.
+4. Criar testes de integração para RLS, limite de empréstimos, atraso, concorrência, devolução e manutenção.
+5. Implementar o serviço que grava ações em `audit_logs` e revisar as vulnerabilidades transitivas indicadas pelo `npm audit`.
+
+### Atenções
+
+- Somente o Supabase local do Docker recebeu tabelas e políticas; o Supabase em nuvem não foi alterado.
+- Não versionar `.env.local`, senhas, URLs privadas ou chaves de serviço.
+- A interface continua sendo um protótipo com dados em memória até que a persistência seja conectada.
+
+### Registro negativo e limites da sessão
+
+- O build do Next.js chegou à compilação, mas não devolveu o encerramento do
+  empacotamento dentro da pasta sincronizada pelo OneDrive. Não trate isso como
+  build aprovado; repita o comando em CI ou fora do diretório sincronizado.
+- As migrações foram testadas apenas contra o Supabase local. Não repetir o
+  teste contra o projeto remoto sem autorização explícita e uma conexão direta
+  de banco configurada.
+- A conexão do Supabase no frontend não torna a interface persistente por si
+  só: enquanto não existirem consultas e mutações no servidor, os dados de
+  demonstração continuam sendo a única fonte usada pela tela.
+
+---
+
+# Registro anterior — contexto histórico
 
 ## O que foi resolvido localmente
 

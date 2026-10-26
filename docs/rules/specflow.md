@@ -2,6 +2,21 @@
 
 Este processo evita que uma ideia de melhoria vá direto para o código sem regras claras de negócio, interface e validação.
 
+## Fonte e organização
+
+Uma funcionalidade relevante deve ter uma spec, um plano e suas tarefas. Os
+três documentos são derivados da mesma necessidade e devem apontar uns para os
+outros. A spec define o comportamento; o plano define a ordem; as tarefas
+quebram a execução em partes verificáveis.
+
+Enquanto os documentos atuais de MVP estiverem nas pastas `docs/specs/`,
+`docs/plans/` e `docs/tasks/`, mantenha seus nomes alinhados. Para uma nova
+funcionalidade, prefira um identificador estável comum, por exemplo
+`001-login`, para permitir rastrear spec, plano, tarefas, testes e código.
+
+Não use o handoff como fonte de verdade do comportamento: ele registra o
+andamento da sessão, pendências e tentativas que não funcionaram.
+
 ## 1. Descrever a necessidade
 
 Registrar em linguagem simples:
@@ -33,6 +48,15 @@ Para cada melhoria, documentar:
 3. Resultado em caso de sucesso.
 4. Mensagem e comportamento em caso de falha.
 5. Alterações esperadas em inventário, histórico e notificações.
+
+Para regras que envolvem acesso, estado, prazo ou dinheiro, escreva também os
+critérios em frases de comportamento verificáveis. Prefira esta forma:
+
+> Quando `<gatilho>`, se `<condição>`, o sistema deve `<resposta>`.
+
+Exemplo: “Quando uma pessoa solicitar um equipamento, se ela tiver um
+empréstimo em atraso, o sistema deve recusar a solicitação sem reservar o
+item.”
 
 ## 4. Implementar em partes pequenas
 
@@ -73,4 +97,10 @@ A melhoria só está pronta quando:
 ## Critérios de aceite
 
 ## Casos de teste
+
+## Rastreabilidade
+
+- ADRs, regras ou decisões dos quais esta spec depende
+- Plano e tarefas derivados desta spec
+- Testes e critérios de aceite que comprovam cada regra
 ```

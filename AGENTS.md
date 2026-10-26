@@ -13,6 +13,33 @@ O comportamento principal do produto está definido em [docs/PRD.md](docs/PRD.md
 - O fluxo inicial inclui login, catálogo, solicitação, devolução e painel de operações.
 - O projeto não deve adicionar funcionalidades fora do escopo da primeira versão sem validação do time.
 
+## Fontes de verdade
+
+Cada artefato tem uma responsabilidade. Em caso de divergência, não escolha
+sozinho: registre o conflito e peça uma decisão.
+
+| Assunto | Fonte de verdade |
+|---|---|
+| Problema, pessoas usuárias e escopo do produto | `docs/PRD.md` |
+| Decisões de arquitetura e tecnologias permitidas | `docs/adr/` |
+| Regras operacionais e restrições para mudanças | `docs/rules/` |
+| Comportamento e aceite de uma funcionalidade | sua spec em `docs/specs/` |
+| Ordem de execução | plano e tasks correspondentes |
+| Estado temporário de uma sessão e tentativas que falharam | `docs/handoff-proximos-passos.md` |
+
+O handoff não substitui PRD, ADR ou spec; ele serve para retomar o trabalho sem
+repetir tentativas e sem transformar suposições em decisão de produto.
+
+## Skills e conexões externas
+
+- Uma skill ensina um procedimento reutilizável; não deve repetir restrições de
+  segurança ou regras de negócio já documentadas.
+- Use uma skill apenas quando a tarefa a pedir ou quando sua descrição for
+  diretamente aplicável.
+- Antes de habilitar uma conexão externa (MCP, banco, deploy ou serviço),
+  verifique quais permissões ela concede e mantenha as restrições de
+  `docs/rules/restrictions.md`.
+
 ## Stack esperada
 Com base em [docs/adr/001-stack.md](docs/adr/001-stack.md):
 
