@@ -2,6 +2,27 @@
 
 Tasks derivadas de [spec funcional](../specs/mvp.md) e [plano](../plans/mvp.md). As tasks bloqueadas não devem ser iniciadas até que suas dependências sejam decididas.
 
+## Reconciliação documental — 26/10/2026
+
+D-01 e seus critérios DOC-01 a DOC-05 estão em
+[alinhamento-aulas.md](../alinhamento-aulas.md). Não equivalem a CAs do MVP.
+T-09 concluída nesta continuidade: instalação restaurada pelo lockfile,
+três testes passaram, lint e build passaram em 26/10/2026. A falha inicial
+de módulo ausente foi resolvida sem atualização de dependências.
+T-04 parcialmente decidida nesta continuidade: usuário autorizou cadastro
+público em 26/10/2026, registrado em docs/specs/001-login/spec.md. Concessão de
+papéis/membership continua pendente; criação de conta não concede Operações.
+Nenhuma tarefa funcional é marcada concluída pela atualização documental.
+
+### Aceite técnico de T-09
+
+- INFRA-01: instalação reproduzível a partir do package-lock.json, sem atualizar versões.
+- INFRA-02: `npm test` executa e encerra sem falha, incluindo renderização React
+  via Testing Library e limpeza do DOM entre testes.
+- INFRA-03: `npm run lint` e `npm run build` passam após a recuperação.
+- O teste de renderização em `tests/login-page.test.tsx` valida infraestrutura;
+  não atesta autenticação nem qualquer CA funcional do MVP.
+
 ## Prioridade atual
 
 Esta ordem substitui a execução rígida por fases quando uma tarefa já possui
@@ -11,13 +32,13 @@ relato do anterior.
 1. **T-07 — Fundação do Next.js e TypeScript:** concluída em 19/10/2026.
    TypeScript e build de produção passaram; o build usou diretório temporário
    porque o OneDrive bloqueou a saída padrão `.next`.
-2. **T-09 — Testes:** configurar Vitest, Testing Library e um comando de teste
-   real; é pré-requisito para transformar a tela demonstrativa em produto.
+2. **T-09 — Testes:** concluída em 26/10/2026; Vitest e Testing Library
+   executáveis, três testes aprovados. Cobertura funcional continua pendente.
 3. **T-04 e T-06 — Provisionamento e permissões:** definir a criação do
    primeiro tenant, memberships e a matriz de acesso. Bloqueiam login, tRPC e
    páginas protegidas.
-4. **T-11 — Login:** implementar Supabase Auth após a decisão de
-   provisionamento.
+4. **T-11 — Login:** autenticação e cadastro público implementados na spec
+   001-login; tenant/papéis continuam pendentes antes de liberar operações reais.
 5. **T-22 e T-23 — Servidor e persistência:** criar o contexto tRPC, os
    procedimentos autorizados e substituir os dados em memória por operações
    no banco.
@@ -42,7 +63,9 @@ relato do anterior.
 
 - [ ] **T-01** Decidir tratamento de devolução danificada ou incompleta. Referência: pergunta 1 do PRD.
 - [ ] **T-02** Decidir quando e como um empréstimo passa a atrasado. Referência: pergunta 2 do PRD.
-- [ ] **T-03** Definir se solicitação é empréstimo imediato ou se existe etapa de retirada/cancelamento. Referência: pergunta 3 do PRD.
+- [ ] **T-03** Parcialmente decidida em 05/11/2026: solicitar já inicia o
+  empréstimo, conforme PRD. Cancelamento e detalhes de contagem do prazo ainda
+  pendentes; reconciliar migrations em tarefa própria após aprovação de DDL.
 - [ ] **T-04** Definir provisionamento de colaboradores e concessão/revogação do papel de Operações. Referência: pergunta 4 do PRD.
 - [ ] **T-05** Decidir retenção e visibilidade do histórico de devoluções. Referência: pergunta 5 do PRD.
 - [ ] **T-06** Definir tenant, papéis e matriz de permissões, pendentes no ADR-001.
@@ -53,14 +76,14 @@ relato do anterior.
 
 - [x] **T-07** Inicializar Next.js App Router e TypeScript em modo `strict`, preservando arquivos e dependências do usuário. Validado em 19/10/2026 com `npx tsc --noEmit` e build de produção.
 - [ ] **T-08** Configurar Tailwind e estrutura de estilos/componentes alinhada ao stack aprovado e ao layout.
-- [ ] **T-09** Configurar Vitest, Testing Library e comandos de teste/build no `package.json`.
+- [x] **T-09** Configurar Vitest, Testing Library e comandos de teste/build no `package.json`. Instalação recuperada sem atualizar versões; `npm test` (3 testes), lint e build passaram em 26/10/2026. Não equivale à aceitação do MVP.
 - [ ] **T-10** Implementar shell responsivo com sidebar, navegação, header e tokens visuais definidos em `docs/layout.md`.
 
 **Pronto quando:** aplicação inicia e builda; navegação compartilhada tem estados de foco acessíveis e funciona em viewport móvel e desktop.
 
 ## Fase 2 — Colaborador
 
-- [ ] **T-11** Implementar `/login` usando Supabase Auth e `@supabase/ssr`, após resolver T-04.
+- [ ] **T-11** Login/cadastro/saída e proteção implementados pela spec 001-login; fechamento da tarefa do MVP ainda depende da matriz de acesso de T-04/T-06.
 - [ ] **T-12** Implementar `/catalogo` com busca, filtros, situação e aviso das regras aprovadas.
 - [ ] **T-13** Implementar `/catalogo/:patrimonio` com estado do item, dados técnicos e confirmação de solicitação.
 - [ ] **T-14** Implementar `/meus-emprestimos` com prazo, limite visual e ação de devolução.

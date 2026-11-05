@@ -1,5 +1,7 @@
 "use client";
 
+import { LogoutButton } from "@/src/components/logout-button";
+
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   ArrowDownLeft,
@@ -245,11 +247,11 @@ export default function Home() {
           <div><strong>Precisa de ajuda?</strong><span>Fale com Operações</span></div>
           <ArrowUpRight size={14} />
         </div>
-        <button className="profile-button" onClick={() => showToast("Perfil de demonstração") }>
-          <div className="profile-avatar">MC</div>
-          <div className="profile-copy"><strong>Marina Castiglioni</strong><span>Administradora</span></div>
-          <MoreHorizontal size={18} />
-        </button>
+        <LogoutButton />
+        <div className="profile-button">
+          <div className="profile-avatar"><UsersRound size={18} /></div>
+          <div className="profile-copy"><strong>Conta autenticada</strong><span>Catálogo demonstrativo</span></div>
+        </div>
       </aside>
 
       <main className="main-area">

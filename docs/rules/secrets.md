@@ -20,23 +20,22 @@ sem valores reais:
 
 - `NEXT_PUBLIC_SUPABASE_URL`: pública; pode ser usada pelo cliente e pelo
   servidor.
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: chave pública anon; pode ser usada pelo
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: chave pública publicável usada pelo código; pode ser usada pelo
   cliente. A proteção dos dados depende da autenticação e das políticas de
   acesso do banco.
-- `NEXT_PUBLIC_SITE_URL`: URL pública da aplicação; pode ser usada pelo
-  cliente e pelo servidor.
+- `NEXT_PUBLIC_APP_URL`: URL pública prevista em `.env.example`; ainda não é
+  consumida pelo código da aplicação.
 - `SUPABASE_SERVICE_ROLE_KEY`: privada; somente no servidor. Bypassa as
   políticas do banco e nunca pode aparecer em componente de cliente ou em
   variável com prefixo `NEXT_PUBLIC_`.
 - `DATABASE_URL`: privada; conexão de runtime do Prisma. Somente no servidor.
-- `DIRECT_URL`: privada; conexão direta usada pelo Prisma Migrate. Somente em
-  comandos de migração e configuração de servidor.
-- `SENTRY_DSN`: configuração de observabilidade; não deve conter segredo no
-  código. Só use se o Sentry for adotado pelo projeto.
-- `SENTRY_AUTH_TOKEN`: privada; somente em ferramentas de build ou CI que
-  precisem autenticar no Sentry.
-- `SENTRY_ORG` e `SENTRY_PROJECT`: configuração de build ou CI; não exponha
-  valores privados no cliente.
+- `DIRECT_URL`: privada; prevista em `.env.example`, mas ainda não lida por
+  `prisma.config.ts`. A CLI Prisma atual usa `DATABASE_URL`; não suponha que
+  preencher `DIRECT_URL` altera o destino das migrations.
+
+Somente `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+e `DATABASE_URL` são consumidas pelo código/configuração atual. Não adicionar
+Sentry ou variáveis de outra integração sem decisão arquitetural e autorização.
 
 ## Procedimento
 
@@ -56,8 +55,8 @@ sem valores reais:
 
 ## Verificação
 
-- Uma busca por `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL`, `DIRECT_URL` ou
-  `SENTRY_AUTH_TOKEN` no código que roda no navegador não retorna ocorrências.
+- Uma busca por `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL` ou `DIRECT_URL`
+  no código que roda no navegador não retorna ocorrências.
 - `.env.example` contém todas as variáveis usadas pelo projeto e nenhum valor
   real.
 - `.env.local` não é versionado.

@@ -10,7 +10,7 @@ evidência, se a spec está pronta.
 
 ## O que você recebe
 O agente principal precisa informar:
-- o caminho da spec: docs/specs/<NNN-nome>/spec.md
+- o caminho da spec: docs/specs/<NNN-nome>/spec.md ou docs/specs/mvp.md
 - o que verificar: intervalo de commits, lista de arquivos, ou
   "tudo que implementa esta spec" (para spec já em produção)
 Se faltar qualquer um dos dois, responda só pedindo o que falta e pare.
@@ -18,13 +18,19 @@ Se faltar qualquer um dos dois, responda só pedindo o que falta e pare.
 ## Antes de começar
 Você NÃO herda a conversa do agente principal. Leia, nesta ordem:
 AGENTS.md, docs/rules/restrictions.md, docs/rules/checks.md, docs/rules/tests.md,
-e na pasta da spec: spec.md, plan.md, tasks.md.
+e os documentos da funcionalidade: spec.md, plan.md, tasks.md.
+Para o MVP legado, leia docs/specs/mvp.md, docs/plans/mvp.md e
+docs/tasks/mvp.md. Para outras specs, siga os links explícitos da spec;
+se plano ou tarefas não forem encontrados, informe a ausência, sem inventar caminhos.
 
 ## Procedimento
 1. Liste todos os critérios de aceite da spec, com o ID de cada um.
 2. Para cada CA, procure a evidência: o teste cujo nome cita o ID do
    CA (docs/rules/tests.md) e o trecho de código que ele exercita.
-3. Rode os comandos de teste e build de docs/rules/checks.md. NÃO rode
+3. Rode os checks aplicáveis de docs/rules/checks.md e informe cada resultado.
+   Para aprovação funcional, a suíte precisa executar os testes dos CAs.
+   Falha antes da execução dos testes não comprova aprovação nem falha de comportamento.
+   NÃO rode
    migration, reset de banco, push, deploy, nem nada que altere banco,
    arquivo ou git. Se os testes apontarem para o banco de produção,
    não rode: pare e avise.

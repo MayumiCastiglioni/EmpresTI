@@ -9,23 +9,32 @@ alwaysApply: true
 > Leitor: agente
 
 ## Quando
-
-Sempre que você for dizer "pronto", "implementado" ou "funcionando".
+Antes de declarar uma tarefa concluída ou apresentar alterações para publicação.
 
 ## Procedimento
+1. Execute `npm test` para mudanças em código, testes ou sua configuração;
+   execute `npm run lint` para código/configuração. Diferencie falha de
+   instalação de teste de comportamento reprovado.
+2. Execute `npm run build` para mudanças estruturais/de runtime e antes de
+   qualquer push autorizado. Exija código de saída zero, não só compilação.
+3. Para schema/migrations, siga [migration.md](migration.md). Reconstrução em
+   banco local descartável deve aplicar as migrations do Prisma desde zero.
+   `supabase db reset` sozinho não aplica `prisma/migrations/`. Confirme destino
+   local e apresente o procedimento antes de reset; não apague o banco de
+   trabalho como check automático.
+4. Revise os arquivos alterados, inclusive alterações anteriores do usuário.
+   Use `git status --short` quando autorizado; preserve e diferencie mudanças
+   preexistentes, sem exigir removê-las para deixar o status limpo.
+5. Relacione a entrega ao CA e à tarefa. Para documentação/infraestrutura,
+   cite seu critério verificável sem inventar CA de produto atendido.
 
-1. Rode `<COMANDO-TESTES>`. Cole a última linha da saída na resposta.
-2. Se a tarefa tocou em migration, rode `supabase db reset` local e confirme que o banco sobe do zero com todas as migrations.
-3. Rode `<COMANDO-BUILD>` antes de qualquer push. Build que quebra na Vercel é o feedback mais lento e mais caro deste projeto.
-4. Rode `git status --short`. Só podem aparecer arquivos do escopo da tarefa.
-5. Diga qual critério de aceitação (`CA-xx`) esta tarefa atende.
+## Documentação sem alteração de runtime
+Confira links locais, comandos contra package.json, fontes oficiais e escopo.
+Testes/build podem ser registrados como não aplicáveis; não diga que passaram
+sem executá-los. Diagnóstico adicional não aprova critérios do produto.
 
 ## Verificação
-
-Pronto = os quatro comandos terminaram sem falha e o `git status` não trouxe surpresa. As duas coisas, não uma.
-
-## Não faça
-
-- Não relate sucesso parcial. Teste vermelho é tarefa não terminada, mesmo que o código "esteja certo".
-- Não tente consertar a mesma falha duas vezes seguidas sem me mostrar a saída do erro.
-- Não rode teste contra o banco remoto.
+Informe cada check aplicável como passou, falhou ou não executado, com motivo.
+Check obrigatório com falha ou sem execução mantém sua tarefa pendente.
+Não repita a mesma tentativa de correção duas vezes sem mostrar o erro.
+Nunca execute testes ou resets contra banco remoto.

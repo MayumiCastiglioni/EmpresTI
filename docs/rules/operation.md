@@ -1,5 +1,11 @@
 # Operação do Emprest
 
+> Rascunho com conflitos pendentes: aprovação, reserva, administrador e
+> tratamento de danos abaixo não constituem decisões aprovadas do produto.
+> Consulte C-01, C-02, C-05 e C-11 em
+> [alinhamento-aulas.md](../alinhamento-aulas.md). Este arquivo não substitui
+> PRD/spec nem define o contrato de autoridade do agente, que está em restrictions.
+
 ## Objetivo
 
 O Emprest controla solicitações, empréstimos e devoluções de equipamentos compartilhados. A operação deve garantir que cada item tenha uma situação clara e que duas pessoas não recebam o mesmo equipamento ao mesmo tempo.
@@ -38,4 +44,9 @@ O Emprest controla solicitações, empréstimos e devoluções de equipamentos c
 
 ## Limites atuais
 
-A interface atual funciona com dados de demonstração no navegador. Login, banco de dados, histórico permanente, alertas e controle de permissões ainda dependem da implementação indicada em [handoff-proximos-passos.md](../handoff-proximos-passos.md).
+O inventário funciona com dados de demonstração no navegador. Login, cadastro
+e saída estão implementados conforme a [spec 001-login](../specs/001-login/spec.md).
+Persistência do inventário e permissões de tenant/Operações seguem pendentes no
+[MVP](../tasks/mvp.md). Alertas e histórico não recebem aprovação por este
+rascunho. Este arquivo trata da operação do produto; o contrato do operador
+do agente, discutido na aula 9, ainda depende das escolhas do usuário.
