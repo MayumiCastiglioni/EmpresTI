@@ -15,6 +15,12 @@ Substituir a planilha compartilhada por um fluxo interno em que colaboradores co
 
 O cadastro de usuários, a atribuição do papel de Operações e o provisionamento do primeiro acesso não estão definidos. Não implementar cadastro aberto nem presumir uma forma de conceder esses acessos.
 
+**Atualização autorizada em 26/10/2026:** o usuário decidiu permitir cadastro
+público por tela, detalhado em [001-login](001-login/spec.md). Esta decisão
+substitui a proibição de cadastro aberto acima para a funcionalidade de acesso.
+Atribuição de papéis, membership e provisionamento do primeiro operador
+continuam pendentes; cadastro no Auth não concede esses privilégios.
+
 ## Regras de negócio
 
 1. Uma pessoa pode manter no máximo três itens emprestados ao mesmo tempo.
@@ -22,6 +28,8 @@ O cadastro de usuários, a atribuição do papel de Operações e o provisioname
 3. Uma pessoa com item em atraso não pode iniciar outro empréstimo.
 4. Equipamento em manutenção não pode ser apresentado como disponível nem solicitado.
 5. Operações deve poder registrar a devolução no balcão.
+6. Decisão de 05/11/2026: solicitar já inicia o empréstimo, sem esperar retirada
+   física. Fonte: esclarecimento de produto no PRD.
 
 Não inferir estados intermediários, cancelamento, tratamento de item danificado, retenção de histórico ou processo de atualização automática de atraso sem a decisão correspondente em [perguntas do PRD](../perguntas-prd.md).
 
@@ -44,7 +52,11 @@ As rotas seguem o [layout](../layout.md), com idioma pt-BR e a identidade visual
 2. **Devolver:** Meus empréstimos ou Empréstimos em aberto → confirmar/registrar devolução → empréstimo deixa de estar em aberto. A próxima situação do equipamento, especialmente quando há dano, depende de decisão.
 3. **Cadastrar:** Operações → formulário de equipamento → salvar → equipamento fica registrado com a situação inicial escolhida.
 
-O fluxo de solicitação acima descreve o caminho visual esperado pelo layout; a questão sobre se “solicitar” equivale à retirada física permanece bloqueadora para definir estados e efeitos persistidos.
+Decisão de 05/11/2026: a confirmação da solicitação inicia o empréstimo.
+Cancelamento, detalhes de contagem do prazo e permissões ainda precisam ser
+fechados. As migrations atuais reservam no INSERT e exigem retirada separada;
+essa divergência deve ser corrigida em tarefa própria com DDL aprovado,
+sem editar migrations já aplicadas.
 
 ## Critérios de aceitação
 
@@ -60,7 +72,7 @@ O fluxo de solicitação acima descreve o caminho visual esperado pelo layout; a
 
 ## Dependências e decisões pendentes
 
-Antes de fechar os contratos de dados e fluxos, responder às questões 1–5 de [perguntas-prd.md](../perguntas-prd.md): devolução danificada/incompleta; cálculo de atraso; significado de solicitar e possível cancelamento; provisionamento e concessão de acesso; histórico de devoluções.
+Antes de fechar os contratos de dados e fluxos, responder às questões 1–5 de [perguntas-prd.md](../perguntas-prd.md): devolução danificada/incompleta; cálculo de atraso; possível cancelamento (início imediato decidido em 05/11/2026); provisionamento e concessão de acesso; histórico de devoluções.
 
 Também é necessário decidir tenant e matriz de permissões, que o ADR-001 deixa em aberto. Não implementar uma regra provisória para essas lacunas. Alterações de schema devem seguir [rules/migration.md](../rules/migration.md) e usar Prisma Migrate como único dono de migrations.
 

@@ -33,3 +33,12 @@ registrada se alguém lembrar de atualizar a linha.
 ## Como saberemos que deu certo
 Operações consegue abandonar a planilha depois de duas semanas
 de uso.
+## Esclarecimento de produto — 05/11/2026
+
+Decisão informada pela usuária nesta conversa: a solicitação já inicia o
+empréstimo. Não há etapa de espera pela retirada para iniciar o empréstimo.
+O prazo padrão continua sendo 14 dias; detalhes de contagem, horário e fuso
+não foram definidos por esta resposta.
+Concessão de acesso de Operações continua pendente. Organização única foi
+indicada como possibilidade ("creio"), ainda sem confirmação; não aprova
+remoção de tenants nem alteração de isolamento ou permissões.

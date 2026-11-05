@@ -40,6 +40,6 @@ Todos os CA-01 a CA-09 da spec atendidos, decisões bloqueadoras resolvidas, tes
 ## Riscos e limites
 
 - As perguntas de negócio e o modelo de tenant/papéis bloqueiam decisões corretas para auth, dados e autorização.
-- O repositório ainda não tem aplicação configurada; dependências presentes não equivalem à fundação aprovada.
+- Next.js e TypeScript estão configurados; o build passou na revisão de 26/10/2026. A interface permanece demonstrativa e a integração tela/API/banco ainda não foi comprovada.
 - A regra de atraso deve ser calculada conforme decisão do time; não assumir job agendado nem definir apenas na interface.
 - Conteúdo de demonstração do layout deve ser tratado como referência visual, não como dado real ou seed de produção.

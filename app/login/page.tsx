@@ -1,15 +1,44 @@
 "use client";
 
-import { type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useState, type FormEvent } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 import { ArrowRight, Package, ShieldCheck } from "lucide-react";
+import { trpc } from "@/src/lib/trpc";
 
 export default function LoginPage() {
   const router = useRouter();
+  const registering = usePathname() === "/cadastro";
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
 
-  function enterCatalog(event: FormEvent<HTMLFormElement>) {
+  async function enterCatalog(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    router.push("/catalogo");
+    if (pending) return;
+    const form = new FormData(event.currentTarget);
+    setPending(true);
+    setError("");
+    setNotice("");
+    try {
+      const input = { email: String(form.get("email")), password: String(form.get("password")) };
+      if (registering) {
+        const result = await trpc.auth.signup.mutate(input);
+        if (result.requiresConfirmation) {
+          setNotice("Confira seu e-mail para confirmar o cadastro e depois entre com sua senha.");
+          return;
+        }
+      } else {
+        await trpc.auth.login.mutate(input);
+      }
+      router.replace("/catalogo");
+      router.refresh();
+    } catch (cause) {
+      setError(cause instanceof Error && ["E-mail ou senha inválidos.", "Informe e-mail e senha válidos.", "Não foi possível entrar agora. Tente novamente em instantes.", "Use uma senha com pelo menos 6 caracteres.", "Não foi possível criar a conta. Confira os dados ou tente novamente mais tarde."].includes(cause.message)
+        ? cause.message : "Não foi possível entrar agora. Tente novamente em instantes.");
+    } finally {
+      setPending(false);
+    }
   }
 
   return (
@@ -51,29 +80,32 @@ export default function LoginPage() {
               <ShieldCheck size={18} strokeWidth={1.8} />
             </span>
             <div>
-              <h2 id="login-title">Entrar</h2>
-              <p>Use o e-mail institucional para acessar.</p>
+              <h2 id="login-title">{registering ? "Criar conta" : "Entrar"}</h2>
+              <p>{registering ? "Cadastre seu e-mail e uma senha." : "Use seu e-mail e senha para acessar."}</p>
             </div>
           </div>
 
           <form className="login-form" onSubmit={enterCatalog}>
             <label htmlFor="email">
               E-mail
-              <input id="email" name="email" type="text" autoComplete="email" placeholder="nome@empresa.com" />
+              <input id="email" name="email" type="email" required maxLength={254} autoComplete="email" placeholder="nome@empresa.com" />
             </label>
             <label htmlFor="password">
               Senha
-              <input id="password" name="password" type="password" autoComplete="current-password" placeholder="Sua senha" />
+              <input id="password" name="password" type="password" required minLength={registering ? 6 : undefined} maxLength={1024} autoComplete={registering ? "new-password" : "current-password"} placeholder="Sua senha" />
             </label>
-            <button className="login-submit" type="submit" aria-describedby="login-setup-note">
-              Entrar
+            {error && <p role="alert">{error}</p>}
+            {notice && <p role="status">{notice}</p>}
+            <button className="login-submit" type="submit" disabled={pending} aria-busy={pending} aria-describedby="login-setup-note">
+              {pending ? "Aguarde…" : registering ? "Criar conta" : "Entrar"}
               <ArrowRight size={17} strokeWidth={2} aria-hidden="true" />
             </button>
           </form>
+          <p><Link href={registering ? "/login" : "/cadastro"}>{registering ? "Já tenho conta. Entrar" : "Não tenho conta. Criar cadastro"}</Link></p>
 
           <div className="login-rule login-rule-form" aria-hidden="true" />
           <p className="login-setup-note" id="login-setup-note">
-            A autenticação ainda não está finalizada.
+            Acesso exclusivo para contas cadastradas.
           </p>
         </div>
       </section>

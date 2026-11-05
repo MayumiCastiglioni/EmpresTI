@@ -7,6 +7,8 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   test: {
+    // Avoid worker startup timeouts alongside the local Supabase containers.
+    maxWorkers: 1,
     environment: "jsdom",
     include: ["tests/**/*.test.{ts,tsx}"],
     setupFiles: ["./tests/setup.ts"],

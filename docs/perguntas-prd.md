@@ -21,3 +21,9 @@
 5. Haverá algum histórico de empréstimos já devolvidos, ou o sistema mostra apenas o estado atual (quem está com o quê agora)?
    tipo: fora de escopo
    por que importa: o PRD não menciona histórico/relatórios, e isso deve ficar escrito explicitamente para não ser implementado "de brinde" junto da tela de Operações, ampliando o escopo da v1 sem necessidade.
+## Atualização das respostas — 05/11/2026
+
+A questão 3 foi parcialmente respondida: solicitar já inicia o empréstimo,
+conforme o esclarecimento no PRD. Cancelamento e detalhes de contagem do
+prazo não foram definidos. A concessão de Operações permanece pendente.
+Organização única é uma indicação ainda a confirmar, não decisão aprovada.

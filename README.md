@@ -1,40 +1,92 @@
-# Emprest
+# EmpresTI
 
-Sistema de controle de **empréstimo de equipamentos**: registra quem está com qual item e permite que as equipes de Colaboradores e Operações acompanhem solicitações e devoluções.
+Sistema interno de empréstimo de equipamentos. Objetivo e escopo: [PRD](docs/PRD.md).
 
-## Stack
+## Estado atual
 
-| Camada | Tecnologia |
-|---|---|
-| Framework | Next.js (App Router) — TypeScript `strict` |
-| API | tRPC (Route Handler em `app/api/trpc/[trpc]/route.ts`) |
-| Banco de dados | Supabase (Postgres + Auth + RLS) via Prisma |
-| Estado de servidor | TanStack Query (`@trpc/react-query`) |
-| Estilização | Tailwind CSS + shadcn/ui |
-| Deploy | Vercel |
+Existem `/login`, `/cadastro` e `/catalogo`. Login/cadastro usam Supabase Auth
+por tRPC, com sessão em cookies httpOnly e saída. Páginas internas exigem sessão.
+Equipamentos, solicitações e devoluções ainda usam demonstração em memória.
+Schema Prisma e duas migrations com RLS/triggers existem, mas não comprovam
+integração dos empréstimos com a interface nem autorização por tenant/papel.
 
-> Decisões detalhadas em [docs/arquitetura/decisoes/001-stack.md](docs/arquitetura/decisoes/001-stack.md).
+| Área | Arquitetura aprovada | Implementação observada |
+|---|---|---|
+| Aplicação | Next.js App Router e TypeScript strict | Configurados; build com geração Prisma passou em 05/11/2026 |
+| API/autorização | tRPC e middlewares de sessão, tenant e administração | tRPC de autenticação implementado; tenant/papéis pendentes |
+| Dados | PostgreSQL/Supabase via Prisma | Schema/migrations existentes; health consulta Postgres local via Prisma; inventário em memória |
+| Login | Supabase Auth com @supabase/ssr | Login, cadastro, sessão httpOnly, proteção e logout testados localmente |
+| Interface | Tailwind, shadcn/ui e Nocturne | Tailwind importado, tokens e CSS próprio; shadcn/ui pendente |
+| Testes | Vitest, Testing Library, Postgres real, createCaller e Playwright | 38 testes em 8 arquivos passaram em 05/11; integrações de Auth têm evidência histórica de 26/10, sem reexecução nesta entrega; Playwright/isolamento pendentes |
 
-## Estrutura
+## Fontes e continuidade
 
+- [AGENTS.md](AGENTS.md): contexto e ponteiros para regras.
+- [ADRs oficiais](docs/adr/001-stack.md): decisões vigentes; a árvore paralela
+  `docs/arquitetura/decisoes/` exige reconciliação pelo time e não autoriza bibliotecas adicionais.
+- [Spec](docs/specs/mvp.md), [plano](docs/plans/mvp.md) e [tarefas](docs/tasks/mvp.md).
+- [Login e cadastro](docs/specs/001-login/spec.md): decisão do usuário permitindo cadastro público e aceite da autenticação.
+- [Restrições](docs/rules/restrictions.md) e [checks](docs/rules/checks.md).
+- [Alinhamento com as aulas](docs/alinhamento-aulas.md): conflitos e decisões pendentes.
+- [Handoff](docs/handoff-proximos-passos.md): estado temporário da sessão.
+
+## Desenvolvimento local
+
+O projeto usa npm e package-lock.json. Em instalação limpa, use `npm ci`.
+Copie `.env.example` para `.env.local` somente se o arquivo local não existir;
+nunca sobrescreva credenciais existentes. Use serviços locais nos testes.
+
+```sh
+npm run db:generate
+npm run dev
+npm test
+npm run lint
+npm run build
 ```
-app/                                 — interface web (Next.js App Router)
-docs/produto/                       — perguntas em aberto para definir o produto
-docs/arquitetura/decisoes/           — decisões de arquitetura (ADR)
-supabase/                            — configuração local do Supabase e migrações
-.env.example                         — modelo de variáveis de ambiente (copie para .env.local)
-```
 
-## Configuração inicial
+A saída do Next.js fica em `build/`, configurada por `distDir`; `npm run start`
+usa essa mesma saída. As pastas antigas `.next` e `.next-validation` foram
+preservadas e excluídas da checagem TypeScript. A troca contorna o erro EPERM
+observado ao limpar a árvore `.next` sincronizada pelo OneDrive; não altera
+telas ou regras de negócio. Validação: [COR-02](docs/validacao-cor02-build.md).
 
-1. Instale as dependências com `npm install`.
-2. Copie `.env.example` para `.env.local` e preencha as chaves do Supabase.
-3. Conecte a CLI ao projeto remoto: `supabase link --project-ref <REF>`.
+### Testar autenticação local
 
-## Desenvolvimento
+O Supabase local precisa estar iniciado e `.env.local` apontar para ele.
+Execute `npm run dev -- --port 3100 --hostname 127.0.0.1` e, em outro terminal,
+`npm run test:auth-local`. O teste recusa Supabase remoto, usa conta temporária
+com senha aleatória e a remove ao terminar. Não imprime cookies ou credenciais.
 
-Execute `npm run dev` e abra `http://localhost:3000`. O painel atual usa dados de demonstração no navegador; as ações ainda não persistem no Supabase.
+As três contas solicitadas pelo usuário foram criadas no Auth local. As senhas
+não ficam no repositório. Configuração remota anterior foi preservada em
+`.env.before-login.local` (ignorado); não trocar para ela ao executar testes.
+Cadastro público foi autorizado pelo usuário nesta sessão, substituindo para
+esta entrega a proibição do ADR-001; a divergência está registrada na spec.
+Confirmação por e-mail segue a configuração do Supabase; localmente está dispensada.
 
-## Deploy
+Supabase local: configuração em `supabase/config.toml`; iniciar com
+`supabase start` quando CLI/Docker estiverem disponíveis. As migrations da
+aplicação ficam em `prisma/migrations/`, sob responsabilidade do Prisma,
+conforme [migration.md](docs/rules/migration.md). Iniciar Supabase não aplica
+essas migrations por si só. Não há docker-compose.yml neste projeto.
 
-O repositório está conectado à **Vercel** via GitHub (`MayumiCastiglioni/EmpresTI`). Cada `git push` na `main` dispara um deploy automático.
+## Verificação de saúde local
+
+GET `/health` consulta somente `SELECT 1` via Prisma e retorna 200/up ou
+503/down, sem detalhes de conexão e com cache desabilitado. Essa rota exata
+não exige sessão; catálogo e caminhos semelhantes continuam protegidos.
+Nesta etapa o cliente recusa DATABASE_URL remota: a prova é de infraestrutura
+local, não liberação de conexão em produção. `npm run build` gera o cliente
+Prisma automaticamente; `npm run db:generate` prepara uma instalação para testes.
+
+Validação de 05/11: Postgres local respondeu 200; um processo separado com
+destino local indisponível respondeu 503. Nenhum schema, migration ou dado de
+produto foi alterado. Página de diagnóstico e demonstração MCP ainda pendentes.
+Planos: [mínimo](docs/plan-andar-zero.md) e
+[continuidade](docs/plans/continuacao-posterior.md).
+
+## Publicação
+
+A rotina local não exige vincular projeto remoto. Deploy, migrations remotas
+e push não fazem parte de um check. Consulte as restrições; configuração e
+estado atual do deploy não foram verificados nesta revisão.

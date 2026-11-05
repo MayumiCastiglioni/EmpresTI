@@ -30,6 +30,19 @@ sozinho: registre o conflito e peça uma decisão.
 O handoff não substitui PRD, ADR ou spec; ele serve para retomar o trabalho sem
 repetir tentativas e sem transformar suposições em decisão de produto.
 
+## Leitura operacional
+
+- Limites de autoridade: [restrictions](docs/rules/restrictions.md).
+- Validação por tarefa: [checks](docs/rules/checks.md) e [testes](docs/rules/tests.md).
+- Mudanças de dados: [migration](docs/rules/migration.md) e [secrets](docs/rules/secrets.md).
+- Ciclo de funcionalidade: [specflow](docs/rules/specflow.md).
+- Fechamento e retomada: [handoff](docs/rules/handoff.md).
+- Conflitos atuais e decisões pendentes: [alinhamento com as aulas](docs/alinhamento-aulas.md).
+- Skills do projeto: `skills/<nome>/SKILL.md`; consulte a descrição antes de usar.
+
+Arquivos Markdown em `docs/rules/` são procedimentos referenciados aqui;
+frontmatter não comprova carregamento automático pelo ambiente do agente.
+
 ## Skills e conexões externas
 
 - Uma skill ensina um procedimento reutilizável; não deve repetir restrições de
@@ -62,10 +75,11 @@ Com base em [docs/adr/001-stack.md](docs/adr/001-stack.md):
 - .env.example: variáveis de ambiente de exemplo
 
 ## Como rodar o projeto localmente
-Antes de qualquer execução, copie o exemplo de ambiente e ajuste os valores locais:
+Se `.env.local` ainda não existir, copie o exemplo e ajuste apenas valores locais.
+Não sobrescreva arquivos de ambiente existentes:
 
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
 ### 1) Subir o banco local
@@ -75,11 +89,8 @@ Se o ambiente local seguir o padrão do Supabase:
 supabase start
 ```
 
-Se usar container PostgreSQL diretamente:
-
-```bash
-docker compose up -d postgres
-```
+O repositório não possui Docker Compose. Iniciar Supabase não aplica as
+migrations Prisma; siga `docs/rules/migration.md` para alterações de schema.
 
 ### 2) Rodar o projeto
 ```bash
@@ -114,6 +125,14 @@ npm run build
 - Não expor segredos em código, logs, commits ou arquivos versionados.
 - Não executar ações de git sem autorização explícita do usuário.
 
+## Subagentes
+- Ficam em agents/<nome>.md. O frontmatter diz quando delegar; o
+  corpo é a instrução completa do subagente.
+- Subagente não herda esta conversa: ao delegar, passe tudo que o
+  arquivo dele pede como entrada.
+- Se o harness não tiver subagentes, abra uma sessão nova e comece
+  com: "Aja conforme agents/<nome>.md." e as entradas pedidas.
+
 ## Política de Git
 - Não fazer `git commit`.
 - Não fazer `git push`.
@@ -130,3 +149,13 @@ Qualquer alteração deve ser validada com pelo menos:
 
 ## Observações finais
 Este arquivo serve como guia operacional para agentes e colaboração no projeto. O foco deve sempre ser manter o código alinhado ao PRD, à stack acordada em [docs/adr/001-stack.md](docs/adr/001-stack.md) e às boas práticas de segurança e qualidade.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

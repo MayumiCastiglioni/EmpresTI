@@ -77,6 +77,13 @@ A melhoria só está pronta quando:
 - Os comandos de qualidade passam.
 - O comportamento e as limitações estão documentados.
 
+## Antes de declarar uma spec pronta
+- Delegue ao subagente verificador-spec (agents/verificador-spec.md),
+  passando o caminho da spec e o intervalo de commits.
+- A spec só é pronta com "Veredito: PRONTA". Qualquer outro resultado
+  volta para as tarefas — quem corrige é o agente principal, nunca o
+  verificador.
+
 ## Modelo para novas especificações
 
 ```md
