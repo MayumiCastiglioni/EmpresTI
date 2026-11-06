@@ -1,3 +1,3 @@
 export function status() {
-  return "error";
+  return "ok";
 }
