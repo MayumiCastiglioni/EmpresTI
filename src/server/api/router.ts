@@ -1,9 +1,7 @@
-import { initTRPC, TRPCError } from "@trpc/server";
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { TRPCError } from "@trpc/server";
 import { healthRouter } from "@/src/server/api/health";
-
-export type AuthContext = { supabase: SupabaseClient };
-const t = initTRPC.context<AuthContext>().create();
+import { inventoryRouter } from "@/src/server/api/inventory";
+import { t } from "@/src/server/api/trpc";
 
 function credentials(value: unknown) {
   if (typeof value !== "object" || value === null ||
@@ -18,6 +16,7 @@ function credentials(value: unknown) {
 
 export const appRouter = t.router({
   health: healthRouter,
+  inventory: inventoryRouter,
   auth: t.router({
     signup: t.procedure.input(credentials).mutation(async ({ ctx, input }) => {
       if (input.password.length < 6) {

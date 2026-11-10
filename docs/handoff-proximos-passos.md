@@ -1,25 +1,28 @@
-# Handoff — 05/11/2026
+# Handoff — 10/11/2026
 
-## Onde parei
-MIN-01 implementada: Prisma local, tRPC health e GET /health público exato.
-Plano/evidência: docs/plan-andar-zero.md; página de diagnóstico ainda ausente.
-MCP auditado voltou à prioridade acadêmica por decisão do usuário.
+Próximo roteiro: [plano de fechamento](plans/fechamento-entrega.md).
 
-## Validação atual
-npm test: 38 testes/8 arquivos; lint e build com prebuild Prisma passaram.
-HTTP real: health 200/up; destino indisponível em processo isolado 503/down (206ms).
-Catálogo, /health-extra e /health/private anônimos redirecionaram para login.
-Gerado cliente Prisma; adaptador pg 7.10.0 instalado; nenhuma migration executada.
-Docker iniciado; Postgres local existente disponível; só SELECT 1 consultado.
-Aplicações temporárias usadas nos probes encerradas; Docker preservado.
-Sem alteração de .env.local, dados de produto ou schema; sem deploy manual.
-Auth real não revalidado; tenant/papéis e empréstimos persistentes pendentes.
-Health recusa destino remoto; prova local não é autorização para uso em produção.
-GitHub main conferida: 2c7d1acf8be9d31f2c0d2be47ab6ef223ba54960.
+## Estado local
 
-## Próximo passo
-Usuário autorizou commit e envio; entrega preparada para codex/alinhamento-aulas.
-Retomada: revisar cobertura de MIN-02 e depois página mínima MIN-03.
-Completar subida/migrations/configuração e demonstração MCP antes do aceite global.
-Minimizar escopo; não implementar acesso de Operações sem decisão do time.
-Confirmar hash/estado remoto pelo Git; main preservada, sem merge ou deploy manual.
+EMP-T03/04/05 concluídas; EMP-T06/07 parciais. HTTP/Auth/cookies e Playwright local passaram.
+Quatro migrations passaram em Postgres descartável limpo.
+Evidências: `docs/validacao-emp-t03-auth.md`, `docs/validacao-emp-t05-t07.md`.
+
+## Checks
+
+`npm test` 81/81; `test:loans-local` 8/8; HTTP e browser local 1/1 cada.
+Lint, TypeScript e build isolado passaram; build padrão esbarra em reparse-point OneDrive.
+Configuração temporária restaurada; sem acesso remoto, deploy ou Git.
+
+## Pendências
+
+EMP-T07: revisão humana de telas, foco e viewports aprovada em 10/11; faltam fotos reais e créditos.
+EMP-T08/PRA-02: revisão independente, isolamento e carregamento nativo.
+PRA-03/04/05: fotos, Storage e conta do professor; produção requer execução humana.
+Preview Vercel: obter log. Operações: acesso futuro pendente.
+Dependências: zero alertas de produção após correções; restam sete moderados de dev.
+
+## Próxima ação
+
+Seguir o plano de fechamento; pedir revisões humanas nos gates e parar antes de
+produção, deploy, fonte alternativa de imagens ou mudança de schema sem aprovação.

@@ -27,3 +27,10 @@ A questão 3 foi parcialmente respondida: solicitar já inicia o empréstimo,
 conforme o esclarecimento no PRD. Cancelamento e detalhes de contagem do
 prazo não foram definidos. A concessão de Operações permanece pendente.
 Organização única é uma indicação ainda a confirmar, não decisão aprovada.
+
+## Atualização — 06/11/2026
+
+Usuária decidiu cinco empréstimos simultâneos, 14 dias úteis com calendário
+pendente e TI-0010 disponível na carga. Ver o PRD e o
+[registro central de decisões e pendências](decisoes-pratica.md). Não duplicar respostas
+futuras nestas duas listas; preservar o histórico e apontar para a fonte.

@@ -6,8 +6,8 @@ Este projeto é um sistema web interno para controle de empréstimo de equipamen
 ## Contexto e regras de negócio
 O comportamento principal do produto está definido em [docs/PRD.md](docs/PRD.md) e deve ser respeitado em qualquer alteração.
 
-- Cada colaborador pode ter no máximo 3 itens emprestados ao mesmo tempo.
-- O prazo padrão de devolução é de 14 dias.
+- Cada colaborador pode ter no máximo 5 itens emprestados ao mesmo tempo (decisão do usuário em 06/11/2026, registrada no PRD).
+- O prazo padrão de devolução é de 14 dias úteis, de segunda a sexta, excluindo feriados nacionais fixos do Brasil e o dia da solicitação; vencimento às 23h59min59s do 14º dia útil no fuso America/Sao_Paulo, com calendário de 2026 a 2030 antes da liberação.
 - Quem estiver em atraso não pode solicitar novo empréstimo.
 - Equipamentos em manutenção não aparecem como disponíveis.
 - O fluxo inicial inclui login, catálogo, solicitação, devolução e painel de operações.
@@ -36,12 +36,26 @@ repetir tentativas e sem transformar suposições em decisão de produto.
 - Validação por tarefa: [checks](docs/rules/checks.md) e [testes](docs/rules/tests.md).
 - Mudanças de dados: [migration](docs/rules/migration.md) e [secrets](docs/rules/secrets.md).
 - Ciclo de funcionalidade: [specflow](docs/rules/specflow.md).
+- Registro obrigatório de decisões e revisão do enunciado: [decisions](docs/rules/decisions.md).
 - Fechamento e retomada: [handoff](docs/rules/handoff.md).
 - Conflitos atuais e decisões pendentes: [alinhamento com as aulas](docs/alinhamento-aulas.md).
 - Skills do projeto: `skills/<nome>/SKILL.md`; consulte a descrição antes de usar.
 
 Arquivos Markdown em `docs/rules/` são procedimentos referenciados aqui;
 frontmatter não comprova carregamento automático pelo ambiente do agente.
+
+## Registro de decisões para a entrega
+
+Toda decisão relevante deve ser registrada na mesma tarefa em
+[decisões da prática](docs/produto/decisoes-pratica.md), refletida na fonte
+competente e resumida no [ENTREGA.md](ENTREGA.md), com data, origem, responsável,
+alternativas, motivo informado e estado real de implementação/validação.
+Conversa e handoff não substituem esse registro. Preservar decisões substituídas
+como histórico, sem deixar resumos atuais desatualizados. Seguir
+[procedimento obrigatório](docs/rules/decisions.md), sem registrar segredos.
+Antes das tarefas e da entrega final, revisar o
+[checklist do enunciado](docs/checklist-enunciado.md); conflitos e pendências
+não podem ser omitidos ou tratados como requisitos cumpridos.
 
 ## Skills e conexões externas
 
@@ -152,7 +166,7 @@ Este arquivo serve como guia operacional para agentes e colaboração no projeto
 
 <!-- BEGIN:nextjs-agent-rules -->
 
-# This is NOT the Next.js you know
+## This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
 

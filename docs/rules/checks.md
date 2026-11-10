@@ -38,3 +38,10 @@ Informe cada check aplicável como passou, falhou ou não executado, com motivo.
 Check obrigatório com falha ou sem execução mantém sua tarefa pendente.
 Não repita a mesma tentativa de correção duas vezes sem mostrar o erro.
 Nunca execute testes ou resets contra banco remoto.
+
+## Rastreabilidade obrigatória
+
+Antes de fechar tarefa, conferir [registro de decisões](decisions.md): decisões
+novas/substituídas no registro central, fonte atualizada e síntese no ENTREGA.md.
+Conferir [checklist do enunciado](../checklist-enunciado.md) para o escopo afetado;
+antes da entrega final, revisar todos os itens contra o material original.

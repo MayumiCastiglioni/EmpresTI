@@ -12,6 +12,20 @@ beforeEach(() => {
 });
 
 describe("Proteção da sessão", () => {
+  it("AZ-05 libera diagnóstico exato sem depender de Auth e mantém subrotas protegidas", async () => {
+    mocks.create.mockImplementation(() => { throw new Error("Auth unavailable"); });
+    const response = await updateSession(new NextRequest("http://localhost:3000/diagnostico"));
+    expect(response.headers.get("location")).toBeNull();
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(mocks.create).not.toHaveBeenCalled();
+  });
+  it("AZ-05 não libera caminhos semelhantes ao diagnóstico", async () => {
+    for (const path of ["/diagnostico-extra", "/diagnostico/private"]) {
+      const response = await updateSession(new NextRequest(`http://localhost:3000${path}`));
+      expect(response.status).toBe(307);
+      expect(response.headers.get("location")).toBe("http://localhost:3000/login");
+    }
+  });
   it("AZ-04 libera apenas health sem depender de Auth ou sessão", async () => {
     mocks.create.mockImplementation(() => { throw new Error("Auth unavailable"); });
     const response = await updateSession(new NextRequest("http://localhost:3000/health"));

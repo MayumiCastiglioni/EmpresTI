@@ -26,11 +26,11 @@ complementares ficam no [planejamento posterior](plans/continuacao-posterior.md)
 | Critério | Situação | Evidência e limite |
 |---|---|---|
 | AZ-01 | Parcial | Supabase configurado em supabase/config.toml, CLI e Docker disponíveis; npm run dev sobe somente Next. Sem comando único nem reconstrução comprovada |
-| AZ-02 | Não comprovado | prisma.config.ts lê DATABASE_URL para a CLI; não há instância Prisma no servidor. Auth funcional não prova acesso Prisma ao Postgres |
+| AZ-02 | Comprovado localmente | Cliente Prisma no servidor e MIN-02: SELECT 1 real com sucesso; conexão sem resposta termina em erro controlado. Prova de ambiente limpo ainda separada |
 | AZ-03 | Parcial | Duas migrations versionadas em prisma/migrations; aplicação atual e reconstrução local do zero não verificadas nesta tarefa |
-| AZ-04 | Ausente | app/ não contém /health e o proxy exige sessão nas rotas não públicas |
-| AZ-05 | Ausente | Não há página consumindo status real de conexão |
-| AZ-06 | Parcial | COR-02 comprovou npm test com 26 testes; nenhum teste de health existe |
+| AZ-04 | Comprovado localmente | GET /health retorna 200/up ou 503/down, com corpo mínimo e no-store, sem depender de sessão. MIN-02 verifica o HTTP real |
+| AZ-05 | Comprovado localmente | MIN-03: /diagnostico consome /health no navegador; carregamento/sucesso/falha testados, desktop/móvel conferidos |
+| AZ-06 | Comprovado localmente | Em 06/11, npm test passa 50 testes; test:health-local verifica quatro cenários HTTP contra aplicação compilada. Requer configuração e Postgres locais |
 | AZ-07 | Parcial | .env.example é rastreado e contém nomes consumidos. DIRECT_URL é documentada mas a CLI lê DATABASE_URL; modelo usa exemplos remotos, que não comprovam configuração local segura |
 | AZ-08 | Parcial | git check-ignore reconhece .env, .env.local e .env.before-login.local; git ls-files desses caminhos não retornou arquivos. Não houve varredura completa de conteúdo/histórico nesta tarefa |
 

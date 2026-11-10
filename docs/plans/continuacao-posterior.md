@@ -1,5 +1,11 @@
 # Continuidade após os requisitos principais
 
+Atualização em 06/11/2026: o
+[plano da nova prática](pratica-sdd-subagentes.md) tem prioridade. Verificador,
+skill de imagens e persistência mínima foram promovidos à entrega atual.
+As entradas abaixo são referência de continuidade, não motivo para adiar
+autorização ou testes essenciais às duas specs da atividade.
+
 Data: 05/11/2026. Retomar após P1 a P4 do
 [plano prioritário](correcoes-aulas.md). Isto é uma lista de trabalho futuro,
 não autorização de implementação nem ampliação do [PRD](../PRD.md).

@@ -17,7 +17,7 @@ integração dos empréstimos com a interface nem autorização por tenant/papel
 | Dados | PostgreSQL/Supabase via Prisma | Schema/migrations existentes; health consulta Postgres local via Prisma; inventário em memória |
 | Login | Supabase Auth com @supabase/ssr | Login, cadastro, sessão httpOnly, proteção e logout testados localmente |
 | Interface | Tailwind, shadcn/ui e Nocturne | Tailwind importado, tokens e CSS próprio; shadcn/ui pendente |
-| Testes | Vitest, Testing Library, Postgres real, createCaller e Playwright | 38 testes em 8 arquivos passaram em 05/11; integrações de Auth têm evidência histórica de 26/10, sem reexecução nesta entrega; Playwright/isolamento pendentes |
+| Testes | Vitest, Testing Library, Postgres real, createCaller e Playwright | 50 testes em 9 arquivos passaram em 06/11; health HTTP e diagnóstico no navegador conferidos; Auth tem evidência histórica de 26/10; isolamento pendente |
 
 ## Fontes e continuidade
 
@@ -81,9 +81,26 @@ Prisma automaticamente; `npm run db:generate` prepara uma instalação para test
 
 Validação de 05/11: Postgres local respondeu 200; um processo separado com
 destino local indisponível respondeu 503. Nenhum schema, migration ou dado de
-produto foi alterado. Página de diagnóstico e demonstração MCP ainda pendentes.
+produto foi alterado. A página `/diagnostico` foi implementada e validada em
+06/11 com carregamento, sucesso, falha e nova consulta. Demonstração MCP pendente.
 Planos: [mínimo](docs/plan-andar-zero.md) e
 [continuidade](docs/plans/continuacao-posterior.md).
+
+Para repetir a integração de saúde, mantenha o Postgres/Supabase local iniciado
+e `.env.local` com DATABASE_URL e NEXT_PUBLIC_SUPABASE_URL locais. Execute:
+
+```sh
+npm run build
+npm run test:health-local
+```
+
+O teste inicia e encerra suas próprias aplicações em portas temporárias,
+consulta a conexão real sem gravar dados, confere a proteção do catálogo e
+simula uma conexão sem resposta usando credenciais fictícias em processo
+isolado. Não muda `.env.local`, não cria contas e não para o banco existente.
+Resultados: [validação MIN-02](docs/validacao-min02-health.md).
+O comando também confere a entrega HTTP da página de diagnóstico e sua
+exceção exata de acesso. Tela e estados: [MIN-03](docs/validacao-min03-diagnostico.md).
 
 ## Publicação
 

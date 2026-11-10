@@ -23,8 +23,8 @@ continuam pendentes; cadastro no Auth não concede esses privilégios.
 
 ## Regras de negócio
 
-1. Uma pessoa pode manter no máximo três itens emprestados ao mesmo tempo.
-2. O prazo padrão de devolução é de 14 dias.
+1. Uma pessoa pode manter no máximo cinco itens emprestados ao mesmo tempo.
+2. O prazo padrão de devolução é de 14 dias úteis.
 3. Uma pessoa com item em atraso não pode iniciar outro empréstimo.
 4. Equipamento em manutenção não pode ser apresentado como disponível nem solicitado.
 5. Operações deve poder registrar a devolução no balcão.
@@ -40,7 +40,7 @@ As rotas seguem o [layout](../layout.md), com idioma pt-BR e a identidade visual
 | Tela | Rota | Requisitos funcionais |
 |---|---|---|
 | Login | `/login` | Entrada com e-mail e senha. Autenticação deve usar Supabase Auth e `@supabase/ssr`, conforme ADR-001. Fluxo de provisionamento ainda depende de decisão. |
-| Catálogo | `/catalogo` | Exibir equipamentos e situação; permitir busca/filtro de catálogo; mostrar limite de três, prazo de 14 dias e bloqueio por atraso. Só item disponível pode iniciar solicitação. |
+| Catálogo | `/catalogo` | Exibir equipamentos e situação; permitir busca/filtro de catálogo; mostrar limite de cinco, prazo de 14 dias úteis e bloqueio por atraso. Só item disponível pode iniciar solicitação. |
 | Detalhe | `/catalogo/:patrimonio` | Exibir estado, descrição e dados do equipamento; para item disponível, apresentar prazo calculado e ação de solicitação. Confirmar antes de registrar o empréstimo. |
 | Meus empréstimos | `/meus-emprestimos` | Exibir os empréstimos atuais do usuário, prazo e ação de devolução; oferecer navegação ao catálogo. |
 | Empréstimos em aberto | `/operacoes/emprestimos` | Exibir todos os empréstimos abertos para Operações, realçar atrasos e permitir registrar devolução. Acesso restrito ao papel autorizado, cuja atribuição precisa ser definida. |
@@ -61,9 +61,9 @@ sem editar migrations já aplicadas.
 ## Critérios de aceitação
 
 - **CA-01:** usuário autenticado consulta catálogo com situação correta por equipamento.
-- **CA-02:** usuário com menos de três itens e sem atraso consegue solicitar equipamento disponível; empréstimo recebe prazo de 14 dias.
+- **CA-02:** usuário com menos de cinco itens e sem atraso consegue solicitar equipamento disponível; empréstimo recebe prazo de 14 dias úteis.
 - **CA-03:** equipamento indisponível ou em manutenção não pode ser solicitado.
-- **CA-04:** usuário que atingiu o limite de três ou possui atraso não consegue iniciar empréstimo e recebe explicação na interface.
+- **CA-04:** usuário que atingiu o limite de cinco ou possui atraso não consegue iniciar empréstimo e recebe explicação na interface.
 - **CA-05:** colaborador consulta apenas os próprios empréstimos e pode registrar devolução do item que está com ele.
 - **CA-06:** Operações autorizada consulta todos os empréstimos em aberto e pode registrar devolução.
 - **CA-07:** Operações autorizada cadastra uma unidade física com os campos definidos; situação de manutenção não é exibida como disponível.
@@ -79,3 +79,15 @@ Também é necessário decidir tenant e matriz de permissões, que o ADR-001 dei
 ## Fora desta spec
 
 Reservas futuras, notificações por e-mail, importação de planilha, gestão de usuários, relatórios/histórico não aprovado e qualquer integração não listada no PRD.
+
+## Atualização de 06/11/2026 — decisões da prática
+
+Limite alterado para cinco e prazo para 14 dias úteis por decisão explícita da
+usuária, registrada no PRD. Critérios de prazo não podem ser aprovados enquanto
+implementação e testes do calendário aprovado não estiverem concluídos. TI-0010 será disponível
+na carga da atividade; somente TI-0004/TI-0007 em manutenção. Esta atualização
+não marca CA atendido e não substitui as duas specs específicas ainda a criar.
+
+Atualização de prazo: segunda a sexta, excluindo feriados nacionais fixos brasileiros
+e o dia da solicitação; vence às 23h59min59s do 14º dia útil em America/Sao_Paulo.
+Decisão do PRD de 06/11; nenhum CA marcado atendido por esta atualização documental.

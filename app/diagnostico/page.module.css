@@ -1,0 +1,40 @@
+.page {
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  padding: 24px;
+  background: var(--application);
+}
+
+.card {
+  display: grid;
+  width: min(100%, 560px);
+  gap: 20px;
+  padding: clamp(20px, 5vw, 36px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.eyebrow, .label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.eyebrow { letter-spacing: .08em; text-transform: uppercase; }
+.card h1 { margin: 0; color: var(--text); font-size: 24px; font-weight: 600; letter-spacing: -.01em; }
+.card p { margin: 0; line-height: 1.6; text-wrap: pretty; }
+.description { color: var(--muted); }
+.result { display: grid; gap: 12px; padding: 20px; border: 1px solid var(--border-soft); border-radius: 8px; background: var(--surface-sunken); }
+.success { color: var(--success); }
+.error { color: var(--danger); }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
+.actions button { min-height: 44px; padding: 10px 16px; color: var(--accent-light); border: 1px solid var(--accent); border-radius: 8px; background: transparent; cursor: pointer; }
+.actions button:disabled { color: var(--muted); border-color: var(--border); cursor: wait; }
+.actions a { display: inline-flex; min-height: 44px; align-items: center; color: var(--accent-light); text-underline-offset: 4px; }
+.actions button:focus-visible, .actions a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .actions button, .actions a { transition: none; }
+}
