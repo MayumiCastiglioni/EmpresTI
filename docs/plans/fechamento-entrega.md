@@ -20,7 +20,10 @@ de 55%, sem pesos oficiais para as etapas.
   professor ou evidência da operação de produção.
 - **Verificador:** R1/R2 exercitaram falha e restauração numa fixture; falta provar
   carregamento nativo e isolamento técnico. Não aceitar as specs por essas rodadas.
-- **Publicação:** causa do Preview Vercel não confirmada; falta log da falha.
+- **Publicação:** log da falha de `main` obtido: `NEXT_NO_ROUTES_MANIFEST`; a
+  versão daquela branch configurava `distDir: build`, divergindo de `.next` esperado
+  pela Vercel. A correção está na branch `codex/alinhamento-aulas`; Preview do
+  commit `bc259e6` passou. `main` e produção não foram atualizadas.
 - **Dependências:** correções compatíveis atualizaram Next.js para 16.4.6 e Prisma
   para 7.10.1. `npm audit --omit=dev` agora reporta zero vulnerabilidades de
   produção; o audit completo mantém sete alertas moderados em ferramentas de dev.
@@ -39,7 +42,7 @@ de 55%, sem pesos oficiais para as etapas.
 | 6 | Desbloquear imagens: obter chave Pexels se a emissão voltar ou pedir autorização formal do professor para uma fonte alternativa; então obter 12 imagens distintas, preparar manifesto e revisar conteúdo/crédito. | Usuária/professor decide a fonte e fornece acesso; agente prepara localmente. | Fonte autorizada; 12 imagens 800×600 aprovadas visualmente; créditos e origens conferidos. |
 | 7 | Fechar DAT-01/04/05/06/07/08 com os insumos aprovados; repetir a carga local e os testes de idempotência, divergência e rollback. | Agente; fotos reais e verificação independente. | DADOS-01 a 06 demonstrados localmente sem usar a conta real como fixture. |
 | 8 | Preparar operação real de fotos/Storage e conta do professor sem executar escrita remota pelo agente; conferir evidências humanas e zero empréstimos. | Usuária/time executa produção, com checklist preparado pelo agente. | Confirmação humana documentada, sem segredos, sem divergências e sem empréstimos indevidos. |
-| 9 | Diagnosticar Preview Vercel a partir do log, corrigir localmente e revalidar. | Usuária fornece o log/acesso de leitura; agente analisa e corrige. | Causa comprovada, correção testada e preview validado pelo responsável. |
+| 9 | **Concluída em 10/11:** inspecionar log do deploy de `main` (05/11), corrigir o diretório de build localmente e validar na Vercel. | CLI Vercel em modo de leitura; nenhuma configuração remota alterada. | Log mostrou `NEXT_NO_ROUTES_MANIFEST`; o commit `bc259e6` usa o diretório `.next` padrão e o Preview terminou com sucesso. Produção segue sem promoção. |
 | 10 | Reler o enunciado completo, fechar ENTREGA.md por critério, validar links/evidências e conferir a versão exata. | Agente prepara; usuária/time revisa e autoriza a entrega. | Nenhuma pendência omitida; GitHub/Vercel e versão final conferidos. Tag final somente com autorização explícita. |
 
 ## Revisões humanas previstas
@@ -51,8 +54,8 @@ de 55%, sem pesos oficiais para as etapas.
    fotos/manifesto antes de qualquer upload.
 3. **Dados reais:** a responsável executa a carga/Storage de produção e confirma a conta
    do professor e zero empréstimos; nenhum segredo deve ser enviado na conversa.
-4. **Vercel:** solicitar o log do Preview antes de atribuir causa ou propor alteração
-   remota.
+4. **Vercel:** diagnóstico do log e Preview corrigido concluídos; produção ainda
+   exige revisar a migration remota e seguir o gate humano antes de promover.
 5. **Aceite final:** revisão independente das specs e aprovação da versão exata antes
    de tag/publicação.
 

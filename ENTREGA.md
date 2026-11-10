@@ -282,19 +282,22 @@ reflete cinco itens e 14 dias úteis.
 
 Checks desta rodada: `npm test` 81/81, `npm run test:loans-local` 8/8,
 `npm run test:loans-http-local` 1/1, `npm run test:loans-browser-local` 1/1,
-`npm run lint` e `npx tsc --noEmit` passaram. Build normal tentou
-remover artefato reparse-point da pasta OneDrive e falhou antes da compilação;
-build isolado passou após restaurar a configuração original. Evidências em
+`npm run lint`, `npx tsc --noEmit` e build de produção passaram após atualização
+das dependências e restauração do `distDir` padrão do Next.js. Evidências em
 [EMP-T05 a EMP-T07](docs/validacao-emp-t05-t07.md).
 
 Limites atuais: RLS de leitura e rotas HTTP/Auth/cookies/browser passaram no
 Postgres/Supabase locais; papel do deployment não comprovado. Em 10/11, a usuária
 aprovou as telas autenticadas, o foco e os tamanhos de viewport. Fotos Pexels reais
 e seus créditos ainda faltam; essa aprovação não cobre as imagens. Falta revisão
-independente dos EMPs e validação da versão final. Build Next passou
-em pasta isolada; build padrão para antes de
-compilar ao limpar um reparse-point do OneDrive. Sem Git, serviço remoto,
-produção, Storage remoto, publicação ou deploy.
+independente dos EMPs e validação da versão final. Build Next passou localmente.
+
+Commit `bc259e6` foi enviado para `codex/alinhamento-aulas`; seu Preview Vercel
+concluiu com sucesso. O deploy de `main` em 05/11 falhou com
+`NEXT_NO_ROUTES_MANIFEST`: o commit `3bcb029` usava `distDir: build`, mas a Vercel
+procurava `.next`. A configuração padrão foi restaurada e a branch atual passou
+no Preview. `main`/produção não foram atualizadas; migration e verificação remotas
+seguem pendentes, sem escrita de produção pelo agente.
 
 Após correções compatíveis, Next.js está em 16.4.6 e Prisma em 7.10.1. `npm audit
 --omit=dev` reporta zero vulnerabilidades de produção; o audit completo ainda
