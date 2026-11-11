@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function updateSession(request: NextRequest) {
-  if (request.nextUrl.pathname === "/health") {
+  if (request.nextUrl.pathname === "/health" || request.nextUrl.pathname === "/diagnostico") {
     const response = NextResponse.next();
     response.headers.set("Cache-Control", "no-store");
     return response;

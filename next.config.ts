@@ -1,8 +1,5 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  // Preserve the existing OneDrive-managed .next tree, which fails cleanup.
-  distDir: "build",
-};
+const nextConfig: NextConfig = {};
 
 export default nextConfig;

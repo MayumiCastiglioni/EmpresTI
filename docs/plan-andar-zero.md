@@ -1,5 +1,10 @@
 # Plano mínimo — comprovação do andar zero
 
+Atualização de prioridade em 06/11/2026: a execução segue o
+[plano da nova prática](plans/pratica-sdd-subagentes.md). MIN-01 a MIN-03 são
+preservadas; as demais MIN servem às specs da atividade quando necessárias.
+A antiga indicação de MIN-04 como próximo trabalho não governa mais a fila.
+
 Repriorizado em 05/11/2026 a pedido do usuário. Substitui a proposta detalhada
 anterior AZ-T00 a AZ-T09. Requisitos: [andar zero](andar-zero.md).
 Ordem geral: [correções](plans/correcoes-aulas.md).
@@ -33,7 +38,16 @@ Catálogo e caminhos semelhantes a health continuaram protegidos.
 Validação final: npm test (38 testes/8 arquivos), npm run lint e npm run build
 com geração Prisma automática passaram. A integração real de Auth não foi
 reexecutada; não houve schema/migration nem dado de produto alterado.
-MIN-02 complementa a cobertura existente; MIN-03 a MIN-06 seguem pendentes.
+MIN-02 concluída em 05/11/2026: comando test:health-local automatiza conexão
+real, proteção anônima e banco sem resposta, sem gravação. Três cenários
+passaram (Node reporta quatro testes contando o agrupador); 38 testes padrão,
+lint e build também passaram. Evidência: [MIN-02](validacao-min02-health.md).
+MIN-03 concluída em 06/11/2026: /diagnostico consulta /health, mostra
+carregamento, sucesso e falha, permite tentar novamente e usa os tokens
+existentes. Testes, integração HTTP e navegador desktop/móvel conferidos;
+catálogo permanece protegido. Evidência: [MIN-03](validacao-min03-diagnostico.md).
+MIN-04 a MIN-06 seguem pendentes; próxima tarefa: comando de subida local,
+preservando env e banco de trabalho, sem reset automático.
 Se MIN-01 exigir arquivos de teste para verificar sua entrega, criá-los junto
 com ela; MIN-02 complementa a cobertura, não posterga validação obrigatória.
 Cada MIN termina com execução local e checks pertinentes antes da seguinte.

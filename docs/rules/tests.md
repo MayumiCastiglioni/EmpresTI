@@ -31,6 +31,14 @@ Os critérios próprios são LOGIN-01 a LOGIN-07 em docs/specs/001-login/spec.md
 os CA-01 a CA-09 do MVP permanecem com cobertura parcial.
 
 ## Cobertura a construir
+
+MIN-02, validada em 05/11/2026: npm run test:health-local é uma integração
+explícita somente leitura, após npm run build. Exige destinos locais, inicia
+aplicações temporárias e consulta SELECT 1; não altera contas/banco. Pode ser
+executada pelo verificador com os pré-requisitos locais confirmados.
+Três cenários passaram; a suíte padrão atual tem 38 testes. Evidências e limites
+em [validacao-min02-health.md](../validacao-min02-health.md).
+
 - CA-01/CA-09: sessão, acesso ao catálogo, tRPC e isolamento.
 - CA-02 a CA-04: 14 dias, limite, atraso, manutenção e concorrência.
 - CA-05/CA-06: dados próprios, acesso de Operações e devolução autorizada.

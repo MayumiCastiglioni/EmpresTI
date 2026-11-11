@@ -1,367 +1,316 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
+import { AlertCircle, CalendarDays, Check, Clock3, Laptop, Package, Search, ShieldCheck } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { LogoutButton } from "@/src/components/logout-button";
+import { trpc } from "@/src/lib/trpc";
+import type { AppRouter } from "@/src/server/api/router";
+import type { inferRouterOutputs } from "@trpc/server";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  Bell,
-  CalendarDays,
-  Check,
-  ChevronDown,
-  CircleHelp,
-  Clock3,
-  Command,
-  Headphones,
-  Laptop,
-  LayoutDashboard,
-  Monitor,
-  MoreHorizontal,
-  Package,
-  Plus,
-  Search,
-  SlidersHorizontal,
-  UsersRound,
-  X,
-  Camera,
-  Tablet,
-  type LucideIcon,
-} from "lucide-react";
+type RouterOutputs = inferRouterOutputs<AppRouter>;
+type CatalogItem = RouterOutputs["inventory"]["catalog"]["list"][number];
+type Loan = RouterOutputs["inventory"]["loans"]["mine"][number];
 
-type Section = "overview" | "requests" | "loans" | "equipment" | "people";
-type LoanStatus = "Pendente" | "Em uso" | "Atrasado" | "Devolvido";
+const dateTime = new Intl.DateTimeFormat("pt-BR", {
+  dateStyle: "long",
+  timeStyle: "short",
+  timeZone: "America/Sao_Paulo",
+});
+const shortDate = new Intl.DateTimeFormat("pt-BR", {
+  dateStyle: "medium",
+  timeZone: "America/Sao_Paulo",
+});
 
-type Loan = {
-  id: string;
-  person: string;
-  team: string;
-  item: string;
-  code: string;
-  due: string;
-  status: LoanStatus;
-  icon: LucideIcon;
-  tone: string;
-};
-
-type Equipment = {
-  name: string;
-  code: string;
-  category: string;
-  status: "Disponível" | "Emprestado" | "Manutenção";
-  icon: LucideIcon;
-  tone: string;
-};
-
-const navigation: { id: Section; label: string; icon: LucideIcon }[] = [
-  { id: "overview", label: "Visão geral", icon: LayoutDashboard },
-  { id: "requests", label: "Solicitações", icon: Clock3 },
-  { id: "loans", label: "Empréstimos", icon: ArrowUpRight },
-  { id: "equipment", label: "Equipamentos", icon: Package },
-  { id: "people", label: "Pessoas", icon: UsersRound },
-];
-
-const initialEquipment: Equipment[] = [
-  { name: "MacBook Pro 14”", code: "EQ-014", category: "Computadores", status: "Emprestado", icon: Laptop, tone: "mint" },
-  { name: "Câmera Sony A7 IV", code: "EQ-022", category: "Audiovisual", status: "Emprestado", icon: Camera, tone: "peach" },
-  { name: "Monitor Dell 27”", code: "EQ-008", category: "Monitores", status: "Emprestado", icon: Monitor, tone: "blue" },
-  { name: "iPad Air 11”", code: "EQ-031", category: "Tablets", status: "Emprestado", icon: Tablet, tone: "lilac" },
-  { name: "Fone Sony WH-1000XM5", code: "EQ-019", category: "Acessórios", status: "Disponível", icon: Headphones, tone: "yellow" },
-  { name: "Logitech MX Master 3S", code: "EQ-027", category: "Acessórios", status: "Disponível", icon: Package, tone: "mint" },
-  { name: "MacBook Air 13”", code: "EQ-006", category: "Computadores", status: "Disponível", icon: Laptop, tone: "blue" },
-  { name: "Monitor LG UltraFine", code: "EQ-011", category: "Monitores", status: "Manutenção", icon: Monitor, tone: "peach" },
-];
-
-const initialLoans: Loan[] = [
-  { id: "EM-1042", person: "Joana Martins", team: "Design de Produto", item: "MacBook Pro 14”", code: "EQ-014", due: "29 set, 2026", status: "Em uso", icon: Laptop, tone: "mint" },
-  { id: "EM-1041", person: "Rafael Costa", team: "Audiovisual", item: "Câmera Sony A7 IV", code: "EQ-022", due: "27 set, 2026", status: "Atrasado", icon: Camera, tone: "peach" },
-  { id: "EM-1039", person: "Miguel Alves", team: "Operações", item: "Monitor Dell 27”", code: "EQ-008", due: "28 set, 2026", status: "Em uso", icon: Monitor, tone: "blue" },
-  { id: "EM-1038", person: "Bruna Reis", team: "Pesquisa", item: "iPad Air 11”", code: "EQ-031", due: "30 set, 2026", status: "Em uso", icon: Tablet, tone: "lilac" },
-  { id: "EM-1035", person: "Ana Lima", team: "Design de Produto", item: "Fone Sony WH-1000XM5", code: "EQ-019", due: "30 set, 2026", status: "Pendente", icon: Headphones, tone: "yellow" },
-  { id: "EM-1034", person: "Pedro Nunes", team: "Tecnologia", item: "Logitech MX Master 3S", code: "EQ-027", due: "02 out, 2026", status: "Pendente", icon: Package, tone: "mint" },
-  { id: "EM-1028", person: "Carla Souza", team: "Marketing", item: "MacBook Air 13”", code: "EQ-006", due: "22 set, 2026", status: "Devolvido", icon: Laptop, tone: "blue" },
-];
-
-const people = [
-  { name: "Joana Martins", team: "Design de Produto", email: "joana.martins@empresa.com", initials: "JM", color: "avatar-coral", loans: 2 },
-  { name: "Rafael Costa", team: "Audiovisual", email: "rafael.costa@empresa.com", initials: "RC", color: "avatar-blue", loans: 1 },
-  { name: "Miguel Alves", team: "Operações", email: "miguel.alves@empresa.com", initials: "MA", color: "avatar-green", loans: 1 },
-  { name: "Bruna Reis", team: "Pesquisa", email: "bruna.reis@empresa.com", initials: "BR", color: "avatar-purple", loans: 1 },
-  { name: "Ana Lima", team: "Design de Produto", email: "ana.lima@empresa.com", initials: "AL", color: "avatar-yellow", loans: 1 },
-];
-
-const sectionTitles: Record<Section, { title: string; subtitle: string }> = {
-  overview: { title: "Visão geral", subtitle: "Acompanhe o movimento dos equipamentos da equipe." },
-  requests: { title: "Solicitações", subtitle: "Revise os pedidos que aguardam uma decisão." },
-  loans: { title: "Empréstimos", subtitle: "Consulte retiradas, prazos e devoluções." },
-  equipment: { title: "Equipamentos", subtitle: "Inventário e disponibilidade dos itens." },
-  people: { title: "Pessoas", subtitle: "Colaboradores com acesso ao inventário." },
-};
-
-function StatusPill({ status }: { status: string }) {
-  const className = status.toLowerCase().replaceAll(" ", "-");
-  return <span className={`status-pill status-${className}`}><span />{status}</span>;
+function equipmentStatus(status: CatalogItem["status"]) {
+  switch (status) {
+    case "DISPONIVEL": return "Disponível";
+    case "EMPRESTADO": return "Emprestado";
+    case "MANUTENCAO": return "Em manutenção";
+    case "RESERVADO": return "Reservado";
+    case "FORA_DE_USO": return "Fora de uso";
+  }
 }
 
-function AppLogo() {
-  return <div className="brand-mark" aria-hidden="true"><Command size={21} strokeWidth={2.5} /></div>;
+function loanStatus(loan: Loan) {
+  if (loan.isOverdue) return "Em atraso";
+  switch (loan.status) {
+    case "SOLICITADO": return "Solicitado";
+    case "RETIRADO": return "Em andamento";
+    case "DEVOLVIDO": return "Devolvido";
+    case "CANCELADO": return "Cancelado";
+  }
 }
 
-const categoryPresentation: Record<string, { icon: LucideIcon; tone: string }> = {
-  Computadores: { icon: Laptop, tone: "mint" },
-  Audiovisual: { icon: Camera, tone: "peach" },
-  Monitores: { icon: Monitor, tone: "blue" },
-  Tablets: { icon: Tablet, tone: "lilac" },
-  Acessórios: { icon: Headphones, tone: "yellow" },
-};
-
-function formatToday() {
-  return new Intl.DateTimeFormat("pt-BR", { weekday: "long", day: "2-digit", month: "long" })
-    .format(new Date())
-    .toLocaleUpperCase("pt-BR");
+function imageSourceLabel(sourceUrl: string) {
+  try {
+    const hostname = new URL(sourceUrl).hostname;
+    if (["pixabay.com", "www.pixabay.com"].includes(hostname)) return "Pixabay";
+    if (["pexels.com", "www.pexels.com"].includes(hostname)) return "Pexels";
+  } catch {
+    // The image link is validated in the initial-data pipeline; malformed legacy data gets a neutral label.
+  }
+  return "Origem";
 }
 
-export default function Home() {
-  const [section, setSection] = useState<Section>("overview");
-  const [loans, setLoans] = useState(initialLoans);
-  const [equipment, setEquipment] = useState(initialEquipment);
-  const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState("Todos");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [toast, setToast] = useState("");
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const closeModalButtonRef = useRef<HTMLButtonElement>(null);
+function friendlyError(error: unknown) {
+  if (error instanceof Error && [
+    "Este equipamento não está mais disponível. Atualize o catálogo.",
+    "Você já tem cinco empréstimos ativos.",
+    "Há um empréstimo em atraso. Regularize-o antes de solicitar outro item.",
+    "O calendário de devolução ainda não cobre esse prazo.",
+    "Sua conta não tem acesso à organização EmpresTI.",
+    "Entre na sua conta para continuar.",
+  ].includes(error.message)) return error.message;
+  return "Não foi possível concluir a solicitação. Atualize os dados e tente novamente.";
+}
 
-  const activeTitle = sectionTitles[section];
-  const available = equipment.filter((item) => item.status === "Disponível").length;
-  const inUse = equipment.filter((item) => item.status === "Emprestado").length;
-  const pending = loans.filter((loan) => loan.status === "Pendente").length;
-  const overdue = loans.filter((loan) => loan.status === "Atrasado").length;
-  const reservedCodes = new Set(loans.filter((loan) => loan.status !== "Devolvido").map((loan) => loan.code));
-  const requestableEquipment = equipment.filter((item) => item.status === "Disponível" && !reservedCodes.has(item.code));
-  const categories = Array.from(new Set(equipment.map((item) => item.category))).map((name) => {
-    const items = equipment.filter((item) => item.category === name);
-    return { name, total: items.length, available: items.filter((item) => item.status === "Disponível").length, ...categoryPresentation[name] };
-  });
+export default function CatalogoPage() {
+  const [catalog, setCatalog] = useState<CatalogItem[] | null>(null);
+  const [loans, setLoans] = useState<Loan[] | null>(null);
+  const [search, setSearch] = useState("");
+  const [loadingError, setLoadingError] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [selectedItem, setSelectedItem] = useState<CatalogItem | null>(null);
+  const [pendingId, setPendingId] = useState("");
+  const confirmButton = useRef<HTMLButtonElement>(null);
+  const cancelButton = useRef<HTMLButtonElement>(null);
+  const triggerButton = useRef<HTMLButtonElement | null>(null);
 
-  useEffect(() => {
-    function focusSearch(event: KeyboardEvent) {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        searchInputRef.current?.focus();
-      }
-    }
-    window.addEventListener("keydown", focusSearch);
-    return () => window.removeEventListener("keydown", focusSearch);
+  const refresh = useCallback(async () => {
+    const [nextCatalog, nextLoans] = await Promise.all([
+      trpc.inventory.catalog.list.query(),
+      trpc.inventory.loans.mine.query(),
+    ]);
+    setCatalog(nextCatalog);
+    setLoans(nextLoans);
+    setLoadingError("");
   }, []);
 
   useEffect(() => {
-    if (!modalOpen) return;
-    closeModalButtonRef.current?.focus();
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") setModalOpen(false);
-    }
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [modalOpen]);
+    let mounted = true;
+    void Promise.all([
+      trpc.inventory.catalog.list.query(),
+      trpc.inventory.loans.mine.query(),
+    ]).then(([nextCatalog, nextLoans]) => {
+      if (!mounted) return;
+      setCatalog(nextCatalog);
+      setLoans(nextLoans);
+    }).catch((error: unknown) => {
+      if (mounted) setLoadingError(friendlyError(error));
+    });
+    return () => { mounted = false; };
+  }, []);
 
-  const filteredLoans = loans.filter((loan) => {
-    const matchesQuery = `${loan.person} ${loan.item} ${loan.code} ${loan.id}`.toLowerCase().includes(query.toLowerCase());
-    const matchesFilter = filter === "Todos" || loan.status === filter;
-    const matchesSection = section === "requests" ? loan.status === "Pendente" : section === "loans" || section === "overview";
-    return matchesQuery && matchesFilter && matchesSection;
-  });
+  useEffect(() => {
+    if (!selectedItem) return;
+    confirmButton.current?.focus();
+    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape" && !pendingId) {
+        setSelectedItem(null);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const first = cancelButton.current;
+      const last = confirmButton.current;
+      if (!first || !last) return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      triggerButton.current?.focus();
+    };
+  }, [selectedItem, pendingId]);
 
-  const filteredEquipment = equipment.filter((item) => `${item.name} ${item.code} ${item.category}`.toLowerCase().includes(query.toLowerCase()));
-  const filteredPeople = people.filter((person) => `${person.name} ${person.team} ${person.email}`.toLowerCase().includes(query.toLowerCase()));
+  const availableCount = catalog?.filter((item) => item.status === "DISPONIVEL").length ?? 0;
+  const visibleCatalog = useMemo(() => {
+    const query = search.trim().toLocaleLowerCase("pt-BR");
+    if (!catalog) return [];
+    if (!query) return catalog;
+    return catalog.filter((item) =>
+      `${item.name} ${item.assetTag} ${item.category}`.toLocaleLowerCase("pt-BR").includes(query),
+    );
+  }, [catalog, search]);
 
-  function showToast(message: string) {
-    setToast(message);
-    window.setTimeout(() => setToast(""), 2800);
+  function openRequest(item: CatalogItem, event: MouseEvent<HTMLButtonElement>) {
+    triggerButton.current = event.currentTarget;
+    setActionError("");
+    setNotice("");
+    setSelectedItem(item);
   }
 
-  function updateLoan(loan: Loan, status: LoanStatus) {
-    setLoans((current) => current.map((item) => item.id === loan.id ? { ...item, status } : item));
-    if (status === "Devolvido") {
-      setEquipment((current) => current.map((item) => item.code === loan.code ? { ...item, status: "Disponível" } : item));
-      showToast("Devolução registrada.");
-    } else {
-      setEquipment((current) => current.map((item) => item.code === loan.code ? { ...item, status: "Emprestado" } : item));
-      showToast("Solicitação aprovada.");
+  function closeDialog() {
+    if (!pendingId) setSelectedItem(null);
+  }
+
+  async function retryLoading() {
+    setLoadingError("");
+    try {
+      await refresh();
+    } catch (error) {
+      setLoadingError(friendlyError(error));
     }
   }
 
-  function addRequest(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const person = String(form.get("person"));
-    const code = String(form.get("equipment"));
-    const dueParts = String(form.get("due")).split("-");
-    const dueMonth = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
-    const selected = equipment.find((item) => item.code === code);
-    const personInfo = people.find((item) => item.name === person);
-    if (!selected || !personInfo || dueParts.length !== 3 || reservedCodes.has(code)) {
-      showToast("Este equipamento não está mais disponível.");
-      return;
+  async function confirmRequest() {
+    if (!selectedItem || pendingId) return;
+    const item = selectedItem;
+    setPendingId(item.id);
+    setActionError("");
+    setNotice("");
+    try {
+      const created = await trpc.inventory.loans.request.mutate({ equipmentId: item.id });
+      setSelectedItem(null);
+      setNotice(`Empréstimo iniciado. Devolução prevista para ${dateTime.format(new Date(created.dueAt))}.`);
+      try {
+        await refresh();
+      } catch {
+        setLoadingError("Empréstimo registrado. Não foi possível atualizar as listas; tente atualizar a página.");
+      }
+    } catch (error) {
+      setActionError(friendlyError(error));
+      if (error instanceof Error && error.message === "Este equipamento não está mais disponível. Atualize o catálogo.") {
+        try {
+          await refresh();
+        } catch {
+          setLoadingError("Não foi possível atualizar as listas; tente atualizar os dados novamente.");
+        }
+      }
+    } finally {
+      setPendingId("");
     }
-    setLoans((current) => [{
-      id: `EM-${1050 + current.length}`,
-      person,
-      team: personInfo.team,
-      item: selected.name,
-      code: selected.code,
-      due: `${dueParts[2]} ${dueMonth[Number(dueParts[1]) - 1]}, ${dueParts[0]}`,
-      status: "Pendente",
-      icon: selected.icon,
-      tone: selected.tone,
-    }, ...current]);
-    setSection("requests");
-    setFilter("Todos");
-    setQuery("");
-    setModalOpen(false);
-    showToast("Solicitação criada.");
   }
 
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <div className="brand"><AppLogo /><span>emprest<span className="brand-period">.</span></span></div>
-        <div className="workspace-switcher">
-          <div className="workspace-avatar">G</div>
-          <div className="workspace-copy"><strong>Germinare</strong><span>Espaço de trabalho</span></div>
-          <ChevronDown size={15} />
+    <main className="borrower-app">
+      <header className="borrower-header">
+        <Link className="borrower-brand" href="/catalogo" aria-label="EmpresTI, início">
+          <span className="borrower-brand-mark"><Package size={18} aria-hidden="true" /></span>
+          <span>EmpresTI</span>
+        </Link>
+        <div className="borrower-header-actions">
+          <span className="borrower-user-label"><ShieldCheck size={15} aria-hidden="true" /> Área do colaborador</span>
+          <LogoutButton />
         </div>
-        <div className="nav-caption">ESPAÇO DE TRABALHO</div>
-        <nav className="main-nav" aria-label="Navegação principal">
-          {navigation.map(({ id, label, icon: Icon }) => (
-            <button key={id} className={`nav-link ${section === id ? "active" : ""}`} onClick={() => { setSection(id); setFilter("Todos"); }}>
-              <Icon size={18} strokeWidth={1.8} /><span>{label}</span>
-              {id === "requests" && pending > 0 && <span className="nav-count">{pending.toString().padStart(2, "0")}</span>}
-            </button>
-          ))}
-        </nav>
-        <div className="sidebar-spacer" />
-        <div className="sidebar-note">
-          <div className="note-icon"><CircleHelp size={17} /></div>
-          <div><strong>Precisa de ajuda?</strong><span>Fale com Operações</span></div>
-          <ArrowUpRight size={14} />
-        </div>
-        <LogoutButton />
-        <div className="profile-button">
-          <div className="profile-avatar"><UsersRound size={18} /></div>
-          <div className="profile-copy"><strong>Conta autenticada</strong><span>Catálogo demonstrativo</span></div>
-        </div>
-      </aside>
+      </header>
 
-      <main className="main-area">
-        <header className="topbar">
-          <div className="breadcrumbs"><span>Workspace</span><span className="crumb-slash">/</span><strong>{activeTitle.title}</strong></div>
-          <div className="topbar-actions">
-            <label className="search-box">
-              <Search size={16} />
-              <input ref={searchInputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar equipamento ou pessoa" aria-label="Buscar equipamento ou pessoa" />
-              <kbd>Ctrl/⌘ K</kbd>
+      <div className="borrower-main">
+        <section className="borrower-intro" aria-labelledby="catalog-title">
+          <div>
+            <span className="borrower-eyebrow">INVENTÁRIO COMPARTILHADO</span>
+            <h1 id="catalog-title">Catálogo de equipamentos<span>.</span></h1>
+            <p>Consulte a disponibilidade e acompanhe seus empréstimos.</p>
+          </div>
+          <div className="borrower-summary" aria-live="polite">
+            <span className="borrower-summary-icon"><Package size={18} aria-hidden="true" /></span>
+            <span><strong>{catalog ? availableCount : "—"}</strong><small>disponíveis agora</small></span>
+          </div>
+        </section>
+
+        {loadingError && <div className="borrower-alert" role="alert"><AlertCircle size={18} /><span>{loadingError}</span><button type="button" onClick={() => void retryLoading()}>Tentar novamente</button></div>}
+        {notice && <div className="borrower-success" role="status"><Check size={18} />{notice}</div>}
+
+        <section className="borrower-section" aria-labelledby="inventory-heading">
+          <div className="borrower-section-heading">
+            <div><h2 id="inventory-heading">Equipamentos</h2><p>O empréstimo começa assim que você confirma a solicitação.</p></div>
+            <label className="borrower-search">
+              <Search size={17} aria-hidden="true" />
+              <span className="visually-hidden">Buscar equipamento</span>
+              <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar por nome ou patrimônio" />
             </label>
-            <div className="notification-wrap">
-              <button className={`icon-button ${notificationsOpen ? "selected" : ""}`} aria-label="Notificações" onClick={() => setNotificationsOpen((open) => !open)}><Bell size={18} /><i /></button>
-              {notificationsOpen && <div className="notification-popover"><strong>Notificações</strong><p>{pending ? `${pending} solicitações aguardam revisão.` : "Tudo em dia por aqui."}</p><span>Atualizado agora</span></div>}
-            </div>
-            <div className="topbar-avatar">MC</div>
-          </div>
-        </header>
-
-        <div className="page-content">
-          <div className="page-heading">
-            <div>
-              <div className="date-label"><CalendarDays size={14} /> {formatToday()}</div>
-              <h1>{activeTitle.title}<span className="heading-dot">.</span></h1>
-              <p>{activeTitle.subtitle}</p>
-            </div>
-            <button className="primary-button" onClick={() => setModalOpen(true)}><Plus size={17} /> Nova solicitação</button>
           </div>
 
-          {(section === "overview" || section === "loans") && <section className="metrics-grid" aria-label="Resumo do inventário">
-            <article className="metric-card"><div className="metric-top"><span>Disponíveis</span><div className="metric-icon green"><Package size={17} /></div></div><div className="metric-value">{available.toString().padStart(2, "0")}<span className="metric-unit">itens</span></div><div className="metric-foot"><span className="trend-positive"><ArrowUpRight size={13} /> 8,2%</span><span>vs. mês passado</span></div></article>
-            <article className="metric-card"><div className="metric-top"><span>Em uso</span><div className="metric-icon blue"><ArrowUpRight size={17} /></div></div><div className="metric-value">{inUse.toString().padStart(2, "0")}<span className="metric-unit">itens</span></div><div className="metric-foot"><span className="trend-neutral">+ 3</span><span>nesta semana</span></div></article>
-            <article className="metric-card"><div className="metric-top"><span>Aguardando revisão</span><div className="metric-icon yellow"><Clock3 size={17} /></div></div><div className="metric-value">{pending.toString().padStart(2, "0")}<span className="metric-unit">pedidos</span></div><div className="metric-foot"><span className="trend-neutral">Requer atenção</span></div></article>
-            <article className="metric-card"><div className="metric-top"><span>Em atraso</span><div className="metric-icon coral"><CalendarDays size={17} /></div></div><div className="metric-value">{overdue.toString().padStart(2, "0")}<span className="metric-unit">itens</span></div><div className="metric-foot"><span className={overdue ? "trend-alert" : "trend-positive"}>{overdue ? "Verificar devolução" : "Tudo em dia"}</span></div></article>
-          </section>}
+          {catalog === null && !loadingError ? (
+            <div className="borrower-placeholder" role="status"><span className="borrower-spinner" />Carregando catálogo…</div>
+          ) : catalog === null ? (
+            <div className="borrower-placeholder">O catálogo não está disponível no momento.</div>
+          ) : catalog?.length === 0 ? (
+            <div className="borrower-placeholder">Nenhum equipamento cadastrado.</div>
+          ) : visibleCatalog.length === 0 ? (
+            <div className="borrower-placeholder">Nenhum equipamento corresponde à busca.</div>
+          ) : (
+            <div className="equipment-grid">
+              {visibleCatalog.map((item) => (
+                <article className="equipment-card" key={item.id}>
+                  <div className="equipment-image-wrap">
+                    {item.image ? <Image className="equipment-image" src={item.image.url} alt={`Imagem de ${item.name}`} width={800} height={600} unoptimized loader={({ src }) => src} /> : <div className="equipment-image-fallback" aria-hidden="true"><Laptop size={35} /></div>}
+                    <span className={`equipment-status ${item.status === "DISPONIVEL" ? "is-available" : ""}`}>
+                      <i aria-hidden="true" />{equipmentStatus(item.status)}
+                    </span>
+                  </div>
+                  <div className="equipment-card-body">
+                    <div className="equipment-category">{item.category}</div>
+                    <h3>{item.name}</h3>
+                    <p className="equipment-tag">Patrimônio <strong>{item.assetTag}</strong></p>
+                    {item.image && <p className="equipment-credit">Foto: <a href={item.image.photographerUrl} target="_blank" rel="noreferrer">{item.image.photographer}</a> · <a href={item.image.sourceUrl} target="_blank" rel="noreferrer">{imageSourceLabel(item.image.sourceUrl)}</a></p>}
+                    {item.status === "DISPONIVEL" ? (
+                      <button className="borrower-request-button" type="button" onClick={(event) => openRequest(item, event)} aria-label={`Solicitar empréstimo de ${item.name}, patrimônio ${item.assetTag}`}>
+                        Solicitar empréstimo
+                      </button>
+                    ) : (
+                      <p className="equipment-unavailable-note">Este item não pode ser solicitado agora.</p>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
 
-          {section === "overview" && <div className="dashboard-grid">
-            <section className="content-panel loan-panel">
-              <div className="panel-heading"><div><h2>Movimentações recentes</h2><p>Solicitações e empréstimos da equipe</p></div><button className="subtle-button" onClick={() => setSection("loans")}>Ver todos <ArrowUpRight size={14} /></button></div>
-              <div className="table-wrap"><table className="data-table"><thead><tr><th>ITEM</th><th>RESPONSÁVEL</th><th>DEVOLUÇÃO</th><th>STATUS</th><th /></tr></thead><tbody>{filteredLoans.slice(0, 5).map((loan) => <LoanRow key={loan.id} loan={loan} onAction={updateLoan} />)}</tbody></table></div>
-              {filteredLoans.length === 0 && <EmptyState query={query} />}
-              <div className="panel-footer"><span>Exibindo {Math.min(filteredLoans.length, 5)} de {filteredLoans.length} registros</span><button onClick={() => setSection("loans")}>Abrir empréstimos <ArrowUpRight size={14} /></button></div>
-            </section>
-            <section className="content-panel attention-panel">
-              <div className="panel-heading"><div><h2>Precisam de atenção</h2><p>Itens para acompanhar hoje</p></div><span className="attention-total">{pending + overdue}</span></div>
-              <div className="attention-list">
-                {loans.filter((loan) => loan.status === "Atrasado" || loan.status === "Pendente").slice(0, 4).map((loan) => {
-                  const Icon = loan.icon;
-                  return <div className="attention-item" key={loan.id}><div className={`item-icon ${loan.tone}`}><Icon size={18} /></div><div className="attention-copy"><strong>{loan.item}</strong><span>{loan.person} · {loan.code}</span></div><StatusPill status={loan.status} /></div>;
-                })}
-                {pending + overdue === 0 && <div className="all-clear"><Check size={18} /> Tudo em dia. Nenhum item exige atenção.</div>}
-              </div>
-              <button className="attention-link" onClick={() => { setSection("requests"); setFilter("Todos"); }}>Revisar solicitações <ArrowUpRight size={14} /></button>
-            </section>
-            <section className="content-panel category-panel">
-              <div className="panel-heading"><div><h2>Inventário por categoria</h2><p>Distribuição dos itens cadastrados</p></div><button className="icon-plain" aria-label="Filtrar categorias"><SlidersHorizontal size={17} /></button></div>
-              <div className="category-list">
-                {categories.map(({ name, available: count, total, icon: Icon, tone }) => <div className="category-row" key={name}><div className={`category-icon ${tone}`}><Icon size={17} /></div><div className="category-name">{name}<span>{count} disponíveis</span></div><div className="category-meter"><i style={{ width: `${(count / total) * 100}%` }} /></div><strong>{total.toString().padStart(2, "0")}</strong></div>)}
-              </div>
-              <button className="attention-link" onClick={() => setSection("equipment")}>Ver inventário completo <ArrowUpRight size={14} /></button>
-            </section>
-            <section className="content-panel week-panel">
-              <div className="panel-heading"><div><h2>Resumo da semana</h2><p>Atividade de 22 a 28 de setembro</p></div><span className="week-chip">Esta semana <ChevronDown size={13} /></span></div>
-              <div className="week-summary"><div><span className="week-number">12</span><span className="week-label">movimentações</span></div><div className="week-change"><span><ArrowDownLeft size={15} /> 4 devoluções</span><span><ArrowUpRight size={15} /> 8 retiradas</span></div></div>
-              <div className="week-chart" aria-label="Gráfico de movimentações por dia"><span style={{ height: "44%" }} /><span style={{ height: "69%" }} /><span style={{ height: "52%" }} /><span style={{ height: "86%" }} /><span style={{ height: "62%" }} /><span style={{ height: "100%" }} /><span style={{ height: "37%" }} /></div>
-              <div className="chart-days"><span>seg</span><span>ter</span><span>qua</span><span>qui</span><span>sex</span><span>sáb</span><span>dom</span></div>
-            </section>
-          </div>}
+        <section className="borrower-section loans-section" aria-labelledby="my-loans-heading">
+          <div className="borrower-section-heading loans-heading">
+            <div><h2 id="my-loans-heading">Meus empréstimos</h2><p>Somente os empréstimos vinculados à sua conta.</p></div>
+            <span className="loans-heading-icon"><CalendarDays size={18} aria-hidden="true" /></span>
+          </div>
+          {loans === null && !loadingError ? (
+            <div className="borrower-placeholder" role="status"><span className="borrower-spinner" />Carregando seus empréstimos…</div>
+          ) : loans === null ? (
+            <div className="borrower-placeholder">Seus empréstimos não estão disponíveis no momento.</div>
+          ) : loans?.length === 0 ? (
+            <div className="borrower-placeholder loans-empty"><Clock3 size={20} />Você ainda não tem empréstimos.</div>
+          ) : (
+            <div className="loans-list">
+              {loans?.map((loan) => (
+                <article className="loan-card" key={loan.id}>
+                  <span className={`loan-card-icon ${loan.isOverdue ? "is-overdue" : ""}`}><Package size={18} aria-hidden="true" /></span>
+                  <div className="loan-card-main">
+                    <h3>{loan.equipment.name}</h3>
+                    <p>{loan.equipment.assetTag} <span aria-hidden="true">·</span> {loan.equipment.category}</p>
+                  </div>
+                  <div className="loan-card-date"><span>Devolução prevista</span><strong>{shortDate.format(new Date(loan.dueAt))}</strong></div>
+                  <span className={`loan-status ${loan.isOverdue ? "is-overdue" : ""}`}>{loan.isOverdue && <AlertCircle size={13} aria-hidden="true" />}{loanStatus(loan)}</span>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
 
-          {section === "loans" && <LoanListing loans={filteredLoans} filter={filter} setFilter={setFilter} onAction={updateLoan} />}
-          {section === "requests" && <LoanListing loans={filteredLoans} filter={filter} setFilter={setFilter} onAction={updateLoan} requestsOnly />}
-          {section === "equipment" && <EquipmentListing items={filteredEquipment} />}
-          {section === "people" && <PeopleListing items={filteredPeople} />}
-        </div>
-        <footer className="app-footer"><span>Emprest <b>·</b> Inventário e empréstimos</span><span>Feito para cuidar do que é compartilhado.</span></footer>
-      </main>
+        <footer className="borrower-footer">EmpresTI <span aria-hidden="true">·</span> Inventário e empréstimos</footer>
+      </div>
 
-      {modalOpen && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setModalOpen(false); }}><section className="request-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div className="modal-heading"><div><span className="modal-kicker">NOVO PEDIDO</span><h2 id="modal-title">Solicitar equipamento</h2><p>Escolha quem precisa e qual item será solicitado.</p></div><button ref={closeModalButtonRef} className="icon-button" onClick={() => setModalOpen(false)} aria-label="Fechar"><X size={18} /></button></div><form onSubmit={addRequest}><label>Pessoa<select name="person" required defaultValue=""><option value="" disabled>Selecione uma pessoa</option>{people.map((person) => <option key={person.name}>{person.name}</option>)}</select></label><label>Equipamento<select name="equipment" required defaultValue=""><option value="" disabled>Selecione um item disponível</option>{requestableEquipment.map((item) => <option key={item.code} value={item.code}>{item.name} · {item.code}</option>)}</select></label><label>Data prevista para devolução<input name="due" type="date" defaultValue="2026-10-05" required /></label><div className="modal-actions"><button type="button" className="secondary-button" onClick={() => setModalOpen(false)}>Cancelar</button><button type="submit" className="primary-button"><Plus size={16} /> Criar solicitação</button></div></form></section></div>}
-      {toast && <div className="toast"><span className="toast-check"><Check size={15} /></span>{toast}</div>}
-    </div>
+      {selectedItem && <div className="borrower-dialog-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) closeDialog(); }}>
+        <section className="borrower-dialog" role="dialog" aria-modal="true" aria-labelledby="request-dialog-title" aria-describedby="request-dialog-copy">
+          <span className="borrower-dialog-icon"><Package size={20} aria-hidden="true" /></span>
+          <h2 id="request-dialog-title">Confirmar empréstimo</h2>
+          <p id="request-dialog-copy">Você vai iniciar agora o empréstimo de <strong>{selectedItem.name}</strong> ({selectedItem.assetTag}). O sistema calculará 14 dias úteis e mostrará a data exata de devolução após a confirmação.</p>
+          {actionError && <p className="borrower-dialog-error" role="alert">{actionError}</p>}
+          <div className="borrower-dialog-actions">
+            <button ref={cancelButton} type="button" className="borrower-cancel-button" onClick={() => closeDialog()} disabled={Boolean(pendingId)}>Cancelar</button>
+            <button ref={confirmButton} type="button" className="borrower-confirm-button" onClick={() => void confirmRequest()} disabled={Boolean(pendingId)} aria-busy={Boolean(pendingId)}>
+              {pendingId ? "Registrando…" : "Confirmar solicitação"}
+            </button>
+          </div>
+        </section>
+      </div>}
+    </main>
   );
-}
-
-function LoanRow({ loan, onAction }: { loan: Loan; onAction: (loan: Loan, status: LoanStatus) => void }) {
-  const Icon = loan.icon;
-  return <tr><td><div className="table-item"><div className={`item-icon ${loan.tone}`}><Icon size={17} /></div><div><strong>{loan.item}</strong><span>{loan.code} <i>·</i> {loan.id}</span></div></div></td><td><div className="person-cell"><div className={`tiny-avatar ${personColor(loan.person)}`}>{initials(loan.person)}</div><div><strong>{loan.person}</strong><span>{loan.team}</span></div></div></td><td className={loan.status === "Atrasado" ? "overdue-date" : "due-date"}>{loan.due}</td><td><StatusPill status={loan.status} /></td><td className="action-cell">{loan.status === "Pendente" ? <button className="row-action" onClick={() => onAction(loan, "Em uso")}>Aprovar</button> : loan.status === "Em uso" || loan.status === "Atrasado" ? <button className="row-action" onClick={() => onAction(loan, "Devolvido")}>Devolver</button> : <span className="completed-mark"><Check size={15} /></span>}</td></tr>;
-}
-
-function LoanListing({ loans, filter, setFilter, onAction, requestsOnly = false }: { loans: Loan[]; filter: string; setFilter: (filter: string) => void; onAction: (loan: Loan, status: LoanStatus) => void; requestsOnly?: boolean }) {
-  const filters = requestsOnly ? ["Todos", "Pendente"] : ["Todos", "Em uso", "Atrasado", "Pendente", "Devolvido"];
-  return <section className="content-panel listing-panel"><div className="listing-toolbar"><div className="filter-tabs" role="tablist" aria-label="Filtrar por status">{filters.map((item) => <button key={item} role="tab" aria-selected={filter === item} className={filter === item ? "current" : ""} onClick={() => setFilter(item)}>{item}{item === "Pendente" && <span>{loans.filter((loan) => loan.status === "Pendente").length}</span>}</button>)}</div><button className="filter-button"><SlidersHorizontal size={15} /> Filtros</button></div><div className="table-wrap"><table className="data-table listing-table"><thead><tr><th>ITEM</th><th>RESPONSÁVEL</th><th>DEVOLUÇÃO</th><th>STATUS</th><th /></tr></thead><tbody>{loans.map((loan) => <LoanRow key={loan.id} loan={loan} onAction={onAction} />)}</tbody></table></div>{loans.length === 0 && <EmptyState query="" />}</section>;
-}
-
-function EquipmentListing({ items }: { items: Equipment[] }) {
-  return <section className="content-panel listing-panel"><div className="listing-toolbar"><div className="listing-summary"><strong>{items.length} equipamentos</strong><span>Inventário atualizado</span></div><button className="filter-button"><SlidersHorizontal size={15} /> Filtros</button></div><div className="table-wrap"><table className="data-table listing-table"><thead><tr><th>EQUIPAMENTO</th><th>CATEGORIA</th><th>CÓDIGO</th><th>STATUS</th><th /></tr></thead><tbody>{items.map((item) => { const Icon = item.icon; return <tr key={item.code}><td><div className="table-item"><div className={`item-icon ${item.tone}`}><Icon size={17} /></div><div><strong>{item.name}</strong><span>Patrimônio compartilhado</span></div></div></td><td>{item.category}</td><td className="code-cell">{item.code}</td><td><StatusPill status={item.status} /></td><td className="action-cell"><button className="icon-plain" aria-label={`Mais opções para ${item.name}`}><MoreHorizontal size={18} /></button></td></tr>; })}</tbody></table></div>{items.length === 0 && <EmptyState query="" />}</section>;
-}
-
-function PeopleListing({ items }: { items: typeof people }) {
-  return <section className="content-panel listing-panel"><div className="listing-toolbar"><div className="listing-summary"><strong>{items.length} pessoas</strong><span>Equipe com acesso ao Emprest</span></div><button className="filter-button"><SlidersHorizontal size={15} /> Filtros</button></div><div className="table-wrap"><table className="data-table listing-table"><thead><tr><th>PESSOA</th><th>EQUIPE</th><th>E-MAIL</th><th>EMPRÉSTIMOS ATIVOS</th><th /></tr></thead><tbody>{items.map((person) => <tr key={person.email}><td><div className="person-cell"><div className={`tiny-avatar ${person.color}`}>{person.initials}</div><div><strong>{person.name}</strong><span>Colaborador</span></div></div></td><td>{person.team}</td><td className="email-cell">{person.email}</td><td><span className="loan-count">{person.loans.toString().padStart(2, "0")}</span></td><td className="action-cell"><button className="icon-plain" aria-label={`Mais opções para ${person.name}`}><MoreHorizontal size={18} /></button></td></tr>)}</tbody></table></div>{items.length === 0 && <EmptyState query="" />}</section>;
-}
-
-function EmptyState({ query }: { query: string }) {
-  return <div className="empty-state"><Search size={20} /><strong>Nenhum resultado encontrado</strong><span>{query ? "Tente buscar por outro termo." : "Ainda não há registros nesta lista."}</span></div>;
-}
-
-function initials(name: string) {
-  return name.split(" ").slice(0, 2).map((part) => part[0]).join("");
-}
-
-function personColor(name: string) {
-  const colors = ["avatar-coral", "avatar-blue", "avatar-green", "avatar-purple", "avatar-yellow"];
-  return colors[name.charCodeAt(0) % colors.length];
 }

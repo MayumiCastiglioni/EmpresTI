@@ -60,17 +60,17 @@ export default function LoginPage() {
 
           <dl className="login-facts">
             <div>
-              <dt>3 itens</dt>
+              <dt>5 itens</dt>
               <dd>por pessoa</dd>
             </div>
             <div>
-              <dt>14 dias</dt>
+              <dt>14 dias úteis</dt>
               <dd>de prazo</dd>
             </div>
           </dl>
         </div>
 
-        <p className="login-version">Operações · v1</p>
+        <p className="login-version">Acesso do colaborador · v1</p>
       </section>
 
       <section className="login-form-section" aria-labelledby="login-title">

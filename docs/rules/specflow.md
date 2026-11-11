@@ -83,6 +83,13 @@ A melhoria só está pronta quando:
 - A spec só é pronta com "Veredito: PRONTA". Qualquer outro resultado
   volta para as tarefas — quem corrige é o agente principal, nunca o
   verificador.
+- Passar também a rodada, escopo e checks permitidos. Comparar as tabelas
+  pelo ID de cada CA. Sem teste obrigatório executado, não aprovar por relato.
+- No Codex, há descoberta em .codex/agents/verificador-spec.toml; as instruções
+  continuam em agents/verificador-spec.md. Configuração nativa não comprova
+  restrições ativas: a sessão pai precisa ser somente leitura e sem ferramentas
+  de produção para declarar isolamento técnico. Com acesso amplo, restringir
+  a prova a fixture e registrar a limitação, sem aprovar segurança de produção.
 
 ## Modelo para novas especificações
 

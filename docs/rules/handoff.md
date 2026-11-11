@@ -20,3 +20,6 @@ pedir para fechar a sessão.
 ## Verificação
 Confira linhas, caminhos e ausência de segredos. Uma sessão nova deve localizar
 a tarefa atual sem confundir pendência com decisão aprovada.
+
+Decisões seguem [decisions.md](decisions.md): atualizar o registro central e
+ENTREGA.md antes do handoff; este resumo só aponta para decisões/evidências.

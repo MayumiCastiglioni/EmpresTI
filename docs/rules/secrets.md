@@ -32,18 +32,25 @@ sem valores reais:
 - `DIRECT_URL`: privada; prevista em `.env.example`, mas ainda não lida por
   `prisma.config.ts`. A CLI Prisma atual usa `DATABASE_URL`; não suponha que
   preencher `DIRECT_URL` altera o destino das migrations.
+- `PIXABAY_API_KEY`: privada e exclusiva da ferramenta local
+  `skills/imagens-equipamentos/scripts/buscar-pixabay.mjs`; não é consumida pela
+  aplicação e não deve ser configurada na Vercel. Deve ficar apenas em
+  `.env.local` da máquina que fará a aquisição de imagens.
 
 Somente `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-e `DATABASE_URL` são consumidas pelo código/configuração atual. Não adicionar
+e `DATABASE_URL` são consumidas pela aplicação/configuração atual.
+`PIXABAY_API_KEY` é lida somente pelo script local de aquisição. Não adicionar
 Sentry ou variáveis de outra integração sem decisão arquitetural e autorização.
 
 ## Procedimento
 
 1. Antes de criar uma variável nova, verifique se uma variável existente já
    atende ao caso. Não crie nomes alternativos para a mesma configuração.
-2. Uma variável nova deve existir nos três lugares apropriados, sem valor
-   versionado: `.env.local` na máquina local, `.env.example` no repositório e
-   painel da Vercel nos ambientes necessários, como Preview e Production.
+2. Uma variável da aplicação deve existir nos três lugares apropriados, sem
+   valor versionado: `.env.local` na máquina local, `.env.example` no repositório
+   e painel da Vercel nos ambientes necessários, como Preview e Production.
+   Uma chave exclusiva de ferramenta local, como `PIXABAY_API_KEY`, não vai à
+   Vercel quando a aplicação não a consome.
 3. Ao criar uma variável, informe na resposta em quais lugares ela foi
    configurada e o que ainda precisa ser feito manualmente.
 4. Use `NEXT_PUBLIC_` somente para valores que possam ser lidos pelo
@@ -59,6 +66,8 @@ Sentry ou variáveis de outra integração sem decisão arquitetural e autoriza�
   no código que roda no navegador não retorna ocorrências.
 - `.env.example` contém todas as variáveis usadas pelo projeto e nenhum valor
   real.
+- `PIXABAY_API_KEY` nunca aparece no bundle da aplicação, no cache, em logs ou
+  em manifestos; a API recebe a chave somente na requisição local autenticada.
 - `.env.local` não é versionado.
 - O build não depende de uma variável que esteja ausente do `.env.example`.
 

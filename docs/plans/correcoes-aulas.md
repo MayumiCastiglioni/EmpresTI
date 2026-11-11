@@ -7,7 +7,16 @@ Fontes: [PRD](../PRD.md), [ADR-001](../adr/001-stack.md),
 [ADR-002](../adr/002-layout-nocturne.md), [restrições](../rules/restrictions.md),
 [conflitos](../alinhamento-aulas.md) e [tarefas do MVP](../tasks/mvp.md).
 
-## Prioridade atual — escopo reduzido em 05/11/2026
+## Prioridade atual — atividade recebida em 06/11/2026
+
+A pedido do usuário, o roteiro ativo é o
+[plano da prática SDD e subagentes](pratica-sdd-subagentes.md): conflitos e
+decisões, verificador, skill Pexels, dados iniciais, solicitação persistente,
+produção pelo usuário e ENTREGA.md. Essa ordem substitui a fila abaixo.
+MIN-01 a MIN-03 já concluídas são aproveitadas; infraestrutura restante passa
+a suporte das novas specs, sem ser abandonada nem declarada concluída.
+
+## Prioridade anterior — escopo reduzido em 05/11/2026
 
 Pedido do usuário: priorizar requisitos principais e registrar as demais
 alterações para continuidade. Esta seção substitui a ordem ampla abaixo;

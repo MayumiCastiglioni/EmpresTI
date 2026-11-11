@@ -67,6 +67,7 @@ model Equipment {
   serialNumber   String?         @map("serial_number")
   pickupLocation String?         @map("pickup_location")
   status         EquipmentStatus @default(DISPONIVEL)
+  image          Json?
   notes          String?
   createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt      DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
@@ -83,7 +84,7 @@ model Loan {
   tenantId          String           @map("tenant_id") @db.Uuid
   equipmentId       String           @map("equipment_id") @db.Uuid
   borrowerId        String           @map("borrower_id") @db.Uuid
-  status            LoanStatus       @default(SOLICITADO)
+  status            LoanStatus       @default(RETIRADO)
   requestedAt       DateTime         @default(now()) @map("requested_at") @db.Timestamptz(6)
   checkedOutAt      DateTime?        @map("checked_out_at") @db.Timestamptz(6)
   dueAt             DateTime         @map("due_at") @db.Timestamptz(6)
