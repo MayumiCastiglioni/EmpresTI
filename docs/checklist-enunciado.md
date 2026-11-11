@@ -1,5 +1,10 @@
 # Revisão do enunciado — requisitos e possíveis pegadinhas
 
+Correção runtime 11/11: guarda local impedia Supabase em produção; correção
+local documentada em [runtime-supabase](verificacao/runtime-supabase.md).
+ENUN-18 continua pendente até publicar/conferir a versão exata com banco,
+membership e inventário reais. Check de configuração não substitui produção.
+
 Atualização de fotos em 11/11: DEC-35 registra aprovação visual das 12 pela
 usuária no manifesto integral `.cache/imagens/manifesto-candidatos.json`.
 Substitui a pendência de aceite visual e a informação de manifesto final não

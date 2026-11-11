@@ -1,5 +1,16 @@
 # Solicitar empréstimo — prática
 
+## Correção de runtime publicado — 11/11/2026
+
+No runtime `NODE_ENV=production`, a conexão Prisma pode usar o PostgreSQL
+gerenciado do Supabase configurado em DATABASE_URL (host direto db.*.supabase.co
+ou pooler *.pooler.supabase.com). Em desenvolvimento/testes, só loopback.
+Protocolos diferentes de postgres/postgresql e parâmetros host/hostaddr são
+recusados. Isso corrige a guarda local de desenvolvimento que impedia o
+catálogo publicado; não altera autenticação, membership ou RLS, nem autoriza
+testes/carga contra produção. Dados/migrations remotos continuam com validação
+separada. Teste de configuração pura não comprova conexão real ou EMP-01 integral.
+
 Estado: implementação local parcial; os critérios de aceite ainda não foram
 aceitos integralmente e falta revisão independente.
 [Plano](../plans/solicitar-emprestimo.md) · [Tarefas](../tasks/solicitar-emprestimo.md).

@@ -1,5 +1,18 @@
 # Entrega da prática
 
+## Correção do catálogo publicado — 11/11/2026
+
+Identificada guarda em src/server/db.ts que aceitava somente banco local,
+inclusive em produção. Corrigida localmente para permitir Supabase no runtime
+de produção, mantendo testes/desenvolvimento locais, RLS e membership.
+[DEC-RUNTIME-SUPABASE](docs/produto/decisoes-pratica.md) e
+[evidências/checks](docs/verificacao/runtime-supabase.md). Alteração não publicada
+nesta sessão; catálogo remoto ainda não validado. O diagnóstico do código local
+não comprova que seja a única pendência no deployment.
+Validação desta correção: **94/94 testes**, configuração pura 15/15, lint e
+TypeScript passaram. Build bloqueado por EPERM em `.next/build/chunks` no
+OneDrive; nenhuma compilação aprovada nesta rodada e nenhum deploy realizado.
+
 ## Fotos — aceite atual de 11/11/2026
 
 **As 12 fotos estão visualmente aprovadas pela usuária**, conforme instrução

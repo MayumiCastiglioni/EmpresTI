@@ -3,16 +3,28 @@ import { PrismaClient } from "@prisma/client";
 
 const databaseState = globalThis as unknown as { localPrisma?: PrismaClient };
 
-export function getDatabase() {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) throw new Error("Configure DATABASE_URL para o banco local.");
+export function databaseConnectionString(environment: NodeJS.ProcessEnv = process.env) {
+  const connectionString = environment.DATABASE_URL;
+  if (!connectionString) throw new Error("Configure DATABASE_URL no servidor.");
 
-  const url = new URL(connectionString);
-  if (!["postgres:", "postgresql:"].includes(url.protocol) ||
-      !["localhost", "127.0.0.1", "[::1]"].includes(url.hostname) ||
-      url.searchParams.has("host") || url.searchParams.has("hostaddr")) {
-    throw new Error("Esta etapa permite somente Postgres local.");
+  let url: URL;
+  try {
+    url = new URL(connectionString);
+  } catch {
+    throw new Error("DATABASE_URL inválida.");
   }
+  const local = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+  const supabase = /^(?:db\.[a-z0-9-]+\.supabase\.co|[a-z0-9-]+\.pooler\.supabase\.com)$/.test(url.hostname);
+  const overridesHost = [...url.searchParams.keys()].some((key) => ["host", "hostaddr"].includes(key.toLowerCase()));
+  if (!["postgres:", "postgresql:"].includes(url.protocol) || overridesHost ||
+      (!local && !(environment.NODE_ENV === "production" && supabase))) {
+    throw new Error("Destino de banco não permitido neste ambiente.");
+  }
+  return connectionString;
+}
+
+export function getDatabase() {
+  const connectionString = databaseConnectionString();
 
   if (!databaseState.localPrisma) {
     const adapter = new PrismaPg({

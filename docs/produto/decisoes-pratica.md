@@ -1,5 +1,22 @@
 # Decisões e pendências da prática
 
+## DEC-RUNTIME-SUPABASE — 11/11/2026
+
+Origem: screenshot da usuária com catálogo/empréstimos indisponíveis após
+login e solicitação anterior de preparar a publicação. Diagnóstico local:
+src/server/db.ts recusava todo endereço não local, inclusive em produção.
+Alternativas operacionais: manter bloqueio absoluto, remover guardas em todos
+os ambientes ou permitir Supabase apenas em produção. Escolha do agente dentro
+do objetivo já autorizado e ADR-001: permitir os hosts Supabase de conexão
+direta/pooler quando NODE_ENV=production e manter loopback em teste/dev.
+Motivo técnico: viabilizar a stack de produção já definida sem executar testes
+remotos ou enfraquecer identidade/RLS. Não é nova decisão de produto/tecnologia.
+Estado: implementado localmente; checks e limites em
+[correção do runtime](../verificacao/runtime-supabase.md). Não implica que esta
+era a única causa no deploy: versão publicada, migrations, grants e membership
+ainda precisam ser conferidos. Nenhuma conexão real, alteração de dados, deploy
+ou operação Git executados nesta correção; não commitado.
+
 ## DEC-35 — aprovação visual integral das fotos — 11/11/2026
 
 Origem/responsável: usuária, instrução explícita "declare todas as fotos como
