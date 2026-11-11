@@ -1,5 +1,11 @@
 # Tarefas — solicitar empréstimo
 
+Correção do runtime de produção (11/11): implementada localmente a
+permissão de Supabase em NODE_ENV=production, mantendo testes/dev locais.
+Configuração 15/15, suíte completa 94/94 e lint/TypeScript passaram; build bloqueado por EPERM no
+OneDrive. Publicação/aceite de produção pendentes; ver
+[runtime-supabase](../verificacao/runtime-supabase.md), DEC-RUNTIME-SUPABASE.
+
 Rodada 11/11, partes 2–4: testes EMP-04/05/07/08 ampliados e refresh DEC-24
 corrigido; componente 7/7, suíte final 85/85, lint e TypeScript passaram.
 EMP-R2A confirmou correção estática; EMP-T08/aceite completo continuam pendentes:

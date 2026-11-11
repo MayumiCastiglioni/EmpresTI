@@ -1,5 +1,0 @@
-[agents]
-enabled = true
-
-[agents.verificador-spec]
-config_file = "agents/verificador-spec.toml"
