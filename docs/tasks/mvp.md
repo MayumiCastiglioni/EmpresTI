@@ -30,8 +30,10 @@ parte da infraestrutura pronta. Cada item só começa após a finalização e o
 relato do anterior.
 
 1. **T-07 — Fundação do Next.js e TypeScript:** concluída em 19/10/2026.
-   TypeScript e build de produção passaram; o build usou diretório temporário
-   porque o OneDrive bloqueou a saída padrão `.next`.
+   TypeScript e build de produção passaram. Build local a partir do OneDrive:
+   usar `npm run build:isolated`, que compila uma cópia temporária fora da pasta
+   sincronizada; manter o build padrão para CI/Vercel. Evidência atual:
+   [COR-02](../validacao-cor02-build.md).
 2. **T-09 — Testes:** concluída em 26/10/2026; Vitest e Testing Library
    executáveis, três testes aprovados. Cobertura funcional continua pendente.
 3. **T-04 e T-06 — Provisionamento e permissões:** definir a criação do

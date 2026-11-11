@@ -10,8 +10,8 @@ config({path:".env.local",quiet:true});
 function photos() {
   return Object.fromEntries(initialEquipment.map(([tag],i)=> {
     const sha256=(i+1).toString(16).padStart(64,"0");
-    return [tag,{provider:"pexels",sourceId:String(i+1),sourceUrl:`https://www.pexels.com/photo/${i+1}/`,photographer:"Fixture sintética",
-      photographerUrl:"https://www.pexels.com/@fixture/",licenseUrl:"https://www.pexels.com/license/",licenseCheckedAt:"2026-11-06",bucket:"equipment-images",
+    return [tag,{provider:"pixabay",sourceId:String(i+1),sourceUrl:`https://pixabay.com/photos/fixture-${i+1}/`,photographer:"Fixture sintética",
+      photographerUrl:`https://pixabay.com/users/fixture-${i+1}/`,licenseUrl:"https://pixabay.com/service/license-summary/",licenseCheckedAt:"2026-11-06",bucket:"equipment-images",
       objectKey:`empresti/${tag}/${sha256}.png`,width:800,height:600,sha256}];
   }));
 }

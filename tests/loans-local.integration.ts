@@ -140,7 +140,68 @@ afterAll(async () => {
 });
 
 describe("EMP-T05/06 — serviço e procedures de empréstimo no Postgres local", () => {
-  test("EMP-01 lista só o catálogo do tenant vinculado e os próprios empréstimos", async () => {
+  test.each([-1, 0, 1])("EMP-04 pedido a %s ms do vencimento preserva a fronteira e não escreve na recusa", async (offset) => {
+    const member = randomUUID();
+    await database!.membership.create({ data: { tenantId, userId: member, role: "COLABORADOR" } });
+    const activeEquipment = await addEquipment(tenantId, `FRONT-${randomUUID()}`);
+    const candidate = await addEquipment(tenantId, `FRONT-${randomUUID()}`);
+    // Future relative to the real DB clock: the trigger remains enabled while
+    // the service's injected clock exercises the exact millisecond boundary.
+    const due = new Date(Date.now() + 86400000);
+    const started = new Date(due.getTime() - 86400000);
+    await database!.loan.create({ data: {
+      tenantId, borrowerId: member, equipmentId: activeEquipment.id,
+      status: "RETIRADO", requestedAt: started, checkedOutAt: started, dueAt: due,
+    } });
+    const attempt = requestLoan(database!, {
+      tenantId, borrowerId: member, equipmentId: candidate.id,
+    }, { now: () => new Date(due.getTime() + offset) });
+    if (offset > 0) {
+      await expect(attempt).rejects.toMatchObject({ code: "BORROWER_OVERDUE" });
+      await expect(database!.loan.count({ where: { tenantId, borrowerId: member } })).resolves.toBe(1);
+      await expect(database!.equipment.findUniqueOrThrow({ where: { id: candidate.id } })).resolves.toMatchObject({ status: "DISPONIVEL" });
+    } else {
+      await expect(attempt).resolves.toMatchObject({ status: "RETIRADO" });
+      await expect(database!.loan.count({ where: { tenantId, borrowerId: member } })).resolves.toBe(2);
+    }
+  });
+
+  test("EMP-05 item de outro tenant é indistinguível de inexistente e não causa escrita", async () => {
+    const foreign = await addEquipment(otherTenantId, `FOREIGN-${randomUUID()}`);
+    const caller = router.createCaller(makeContext(borrowerId));
+    const before = await database!.loan.count({ where: { tenantId } });
+    for (const equipmentId of [foreign.id, randomUUID()]) {
+      await expect(caller.loans.request({ equipmentId })).rejects.toMatchObject({
+        code: "CONFLICT", message: "Este equipamento não está mais disponível. Atualize o catálogo.",
+      });
+    }
+    await expect(database!.loan.count({ where: { tenantId } })).resolves.toBe(before);
+    await expect(database!.equipment.findUniqueOrThrow({ where: { id: foreign.id } })).resolves.toMatchObject({ status: "DISPONIVEL" });
+  });
+
+  test("EMP-08 rejeita campos de autoridade forjados antes de qualquer escrita", async () => {
+    const equipment = await addEquipment(tenantId, `FORGE-${randomUUID()}`);
+    const caller = router.createCaller(makeContext(borrowerId));
+    for (const extra of [
+      { borrowerId: coworkerId }, { tenantId: otherTenantId },
+      { dueAt: "2030-01-01T00:00:00Z" }, { requestedAt: "2026-01-01T00:00:00Z" },
+      { checkedOutAt: "2026-01-01T00:00:00Z" }, { status: "DEVOLVIDO" },
+    ]) {
+      await expect(caller.loans.request({ equipmentId: equipment.id, ...extra } as never)).rejects.toMatchObject({ code: "BAD_REQUEST" });
+    }
+    await expect(database!.loan.count({ where: { equipmentId: equipment.id } })).resolves.toBe(0);
+    await expect(database!.equipment.findUniqueOrThrow({ where: { id: equipment.id } })).resolves.toMatchObject({ status: "DISPONIVEL" });
+  });
+
+  test("EMP-07 calendário sem cobertura recusa o pedido antes da transação", async () => {
+    const equipment = await addEquipment(tenantId, `CAL-${randomUUID()}`);
+    await expect(requestLoan(database!, { tenantId, borrowerId, equipmentId: equipment.id }, {
+      now: () => new Date("2030-12-31T15:00:00Z"),
+    })).rejects.toMatchObject({ code: "CALENDAR_UNAVAILABLE" });
+    await expect(database!.loan.count({ where: { equipmentId: equipment.id } })).resolves.toBe(0);
+    await expect(database!.equipment.findUniqueOrThrow({ where: { id: equipment.id } })).resolves.toMatchObject({ status: "DISPONIVEL" });
+  });
+  test("EMP-01/EMP-08 lista só o catálogo do tenant vinculado e os próprios empréstimos sob RLS", async () => {
     const available = await addEquipment(tenantId, `TI-${randomUUID()}`);
     await addEquipment(tenantId, `TI-${randomUUID()}`, "MANUTENCAO");
     const foreign = await addEquipment(otherTenantId, `TI-${randomUUID()}`);
@@ -177,6 +238,18 @@ describe("EMP-T05/06 — serviço e procedures de empréstimo no Postgres local"
       expect(loansVisibleToRole.map((loan) => loan.id)).toEqual([ownLoan.id]);
       expect(loansVisibleToRole.map((loan) => loan.id)).not.toContain(coworkerLoan.id);
     });
+    await withAuthenticatedRls(database!, coworkerId, async (transaction) => {
+      const visible = await transaction.loan.findMany({ where: { id: ownLoan.id } });
+      expect(visible).toEqual([]);
+      const updated = await transaction.loan.updateMany({ where: { id: ownLoan.id }, data: { status: "DEVOLVIDO" } });
+      expect(updated.count).toBe(0);
+    });
+    await withAuthenticatedRls(database!, randomUUID(), async (transaction) => {
+      expect(await transaction.loan.findMany({ where: { tenantId } })).toEqual([]);
+      expect(await transaction.equipment.findMany({ where: { tenantId } })).toEqual([]);
+    });
+    await expect(router.createCaller(makeAnonymousContext()).loans.mine()).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+    await expect(database!.loan.findUniqueOrThrow({ where: { id: ownLoan.id } })).resolves.toMatchObject({ status: "RETIRADO" });
   });
 
   test("EMP-02 cria imediatamente, usa identidade do servidor e atualiza equipamento na mesma transação", async () => {
@@ -201,7 +274,7 @@ describe("EMP-T05/06 — serviço e procedures de empréstimo no Postgres local"
     } as never)).rejects.toMatchObject({ code: "BAD_REQUEST" });
   });
 
-  test("EMP-02 recusa manutenção, equipamento desconhecido e novo pedido de item já emprestado", async () => {
+  test("EMP-05 recusa manutenção, equipamento desconhecido e novo pedido de item já emprestado", async () => {
     const maintenance = await addEquipment(tenantId, `TI-${randomUUID()}`, "MANUTENCAO");
     const available = await addEquipment(tenantId, `TI-${randomUUID()}`);
     const caller = router.createCaller(makeContext(borrowerId));
@@ -220,12 +293,14 @@ describe("EMP-T05/06 — serviço e procedures de empréstimo no Postgres local"
       await seedActiveLoan({ tenant: tenantId, borrower: member, equipmentId: equipment.id });
     }
     const sixth = await addEquipment(tenantId, `LIM-${randomUUID()}`);
+    const before = await database!.loan.count({ where: { tenantId, borrowerId: member } });
 
     await expect(router.createCaller(makeContext(member)).loans.request({ equipmentId: sixth.id })).rejects.toMatchObject({
       code: "PRECONDITION_FAILED",
       message: "Você já tem cinco empréstimos ativos.",
     });
     await expect(database!.equipment.findUniqueOrThrow({ where: { id: sixth.id } })).resolves.toMatchObject({ status: "DISPONIVEL" });
+    await expect(database!.loan.count({ where: { tenantId, borrowerId: member } })).resolves.toBe(before);
   });
 
   test("EMP-04 bloqueia novo empréstimo quando a pessoa tem item vencido", async () => {
@@ -242,7 +317,7 @@ describe("EMP-T05/06 — serviço e procedures de empréstimo no Postgres local"
     await expect(database!.equipment.findUniqueOrThrow({ where: { id: requestedEquipment.id } })).resolves.toMatchObject({ status: "DISPONIVEL" });
   });
 
-  test("EMP-05 serializa pedidos simultâneos de itens diferentes no limite", async () => {
+  test("EMP-06 serializa pedidos simultâneos de itens diferentes no limite", async () => {
     if (!requestDbA || !requestDbB) throw new Error("Clientes de teste não inicializados.");
     const member = randomUUID();
     await database!.membership.create({ data: { tenantId, userId: member, role: "COLABORADOR" } });
@@ -270,7 +345,7 @@ describe("EMP-T05/06 — serviço e procedures de empréstimo no Postgres local"
     expect(finalEquipment.filter((item) => item.status === "DISPONIVEL")).toHaveLength(1);
   });
 
-  test("EMP-05 serializa dois colaboradores que pedem o mesmo equipamento", async () => {
+  test("EMP-06 serializa dois colaboradores que pedem o mesmo equipamento", async () => {
     if (!requestDbA || !requestDbB) throw new Error("Clientes de teste não inicializados.");
     const firstBorrower = randomUUID();
     const secondBorrower = randomUUID();
@@ -329,5 +404,13 @@ describe("EMP-T05/06 — serviço e procedures de empréstimo no Postgres local"
     })).rejects.toThrow("falha sintética após inserção");
     await expect(database!.loan.count({ where: { tenantId, equipmentId: equipment.id } })).resolves.toBe(0);
     await expect(database!.equipment.findUniqueOrThrow({ where: { id: equipment.id } })).resolves.toMatchObject({ status: "DISPONIVEL" });
+  });
+
+  test("EMP-10 reenvio do mesmo pedido não cria segundo empréstimo ativo", async () => {
+    const equipment = await addEquipment(tenantId, `REEN-${randomUUID()}`);
+    const caller = router.createCaller(makeContext(borrowerId));
+    await caller.loans.request({ equipmentId: equipment.id });
+    await expect(caller.loans.request({ equipmentId: equipment.id })).rejects.toMatchObject({ code: "CONFLICT" });
+    await expect(database!.loan.count({ where: { tenantId, equipmentId: equipment.id, status: "RETIRADO" } })).resolves.toBe(1);
   });
 });

@@ -1,7 +1,8 @@
 # PRA-02 — resultado da prova controlada
 
-Data: 06/11/2026. Spec técnica: [spec.md](spec.md).
-**Estado da PRA-02: parcialmente concluída.** Nenhuma spec de produto aprovada.
+Data inicial: 06/11/2026. Fechamento: 10/11/2026. Spec técnica: [spec.md](spec.md).
+**Estado da PRA-02: concluída para a prova controlada da fixture.** Nenhuma spec
+de produto foi aprovada.
 
 ## Rodadas reais, independentes e comparáveis
 
@@ -15,6 +16,12 @@ As respostas estão preservadas em [R1](rodada-r1.md) e [R2](rodada-r2.md).
 | Correção pelo verificador | Nenhuma; erro permaneceu após revisão | Nenhuma; teste continuou intacto |
 | Veredito | NÃO PRONTA | PRONTA somente para a fixture |
 | Isolamento técnico | NÃO COMPROVADO | NÃO COMPROVADO |
+
+R3 não alcançou a execução do teste: o shell iniciou na raiz do sistema e a
+travessia até o OneDrive foi negada pelo perfil restrito. R4 contornou isso sem
+ampliar acesso: o Node foi iniciado no diretório do repositório com preservação
+de links. R4: PROVA-01 ATENDIDO, 1 teste passou e nenhum arquivo foi alterado;
+isolamento técnico COMPROVADO pelas negações efetivas abaixo.
 
 O agente principal plantou a falha apenas em status.mjs da fixture e restaurou
 o retorno correto após R1. Testes e código da aplicação não foram adulterados.
@@ -31,26 +38,29 @@ SHA-256 do teste, sem mudança em nenhuma rodada:
 `60e2102172f0d3ab4fbc5a639fe438537dcf6dff2b24b53f50842242d0415e8a`.
 Os hashes foram medidos antes/depois; não substituem os commits da atividade.
 
-## Configuração e limite que não será ocultado
+## Configuração nativa e isolamento técnico
 
-O contrato permanece em agents/verificador-spec.md. O arquivo nativo
-.codex/agents/verificador-spec.toml aponta para ele, sem copiar seu corpo,
-e solicita redução de apps/plugins/memória/pedido de permissões. TOML foi
-validado por parser, mas descoberta/aplicação na sessão nativa não foi provada.
-As rodadas usaram delegação explícita do contrato, não o carregamento do TOML.
+O contrato permanece em agents/verificador-spec.md. O agente nativo em
+.codex/agents/verificador-spec.toml aponta para esse arquivo e desativa
+apps/plugins/memória/pedido de permissões. .codex/config.toml registra
+config_file = "agents/verificador-spec.toml"; o caminho é relativo ao arquivo
+que declara o papel. Na R4, uma sessão Codex confiou o projeto só para essa
+execução, ignorou a configuração pessoal e carregou/invocou o agente nativamente.
 
-A documentação oficial informa que agentes personalizados herdam permissões
-da sessão pai; sandbox_mode no arquivo de agente não substitui a configuração
-do pai. Fonte consultada em 06/11:
-[Subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents).
-Por isso não foi adicionado um sandbox_mode decorativo ao TOML nem declarada
-segurança de produção apenas porque o verificador obedeceu às instruções.
+O perfil pai MXC era read-only, rede desligada, leitura restrita ao repositório,
+perfil pessoal negado e .env, .env.before-login.local, .env.example e .env.local
+negados. Apps/plugins e MCPs estavam desativados; configuração pessoal ignorada;
+ambiente herdado limitado a core, com variáveis contendo KEY, SECRET e TOKEN
+filtradas. Probes reais: gravação no projeto e acesso ao perfil/.env* retornaram
+EPERM; conexão TCP a 127.0.0.1:65432 retornou EACCES.
 
-Para encerrar PRA-02, ainda falta iniciar e testar uma sessão pai com escrita
-e acesso a produção bloqueados de fato, sem MCPs/credenciais de produção.
-Não alterar a política global de acesso do usuário nesta tarefa. Os dois commits
-de erro/restauração foram criados em rodada posterior após autorização específica:
-12aa161 e d8bdcbb. Não houve push; isso não prova isolamento técnico.
+O shell interno começou no diretório raiz do sistema; Set-Location para o
+OneDrive foi bloqueado. Para manter o perfil restrito, R4 iniciou node.exe com
+WorkingDirectory no repositório e preservação de links Node via NODE_OPTIONS;
+os argumentos do check permaneceram --test tests/fixtures/verificador-spec/status.test.mjs.
+Resultado real: 1 passou, 0 falharam. Esta prova cobre somente a fixture e não
+declara segurança da produção. Os commits históricos 12aa161 e d8bdcbb seguem
+locais; não houve push nem operação Git em R3/R4.
 
 ## Checks atuais
 
@@ -59,6 +69,8 @@ de erro/restauração foram criados em rodada posterior após autorização espe
   não foi considerada aprovada. Sem alteração de código, a repetição isolada passou.
 - npm run lint: aprovado, saída 0.
 - Parser TOML, 24 links locais e hashes da fixture restaurada: aprovados.
+- R4: agente nativo carregado; check permitido passou 1/1 sob o perfil MXC.
+- Probes MXC: escrita no workspace/perfil/.env* bloqueada; TCP bloqueado.
 - Build não repetido: nenhuma mudança de estrutura/runtime da aplicação.
 - Na rodada inicial, nenhuma operação Git, banco, Storage ou deploy foi executada.
 
@@ -77,8 +89,7 @@ reportou ATENDIDO somente para PROVA-01 da fixture. O status final está
 restaurado e a fixture não está modificada. Os commits são locais; não houve
 push. Foram limitados aos dois arquivos `tests/fixtures/verificador-spec/`.
 
-As duas rodadas continuaram marcando isolamento técnico como NÃO COMPROVADO.
-O papel foi acionado pela ferramenta de colaboração explicitamente; isso não
-prova descoberta do `.codex/agents/verificador-spec.toml` pelo Codex nativo.
-PV-06 concluído; PV-05, descoberta nativa e fechamento integral da PRA-02 seguem
-pendentes. A autorização de dois commits não autorizou push ou outras operações Git.
+Histórico até R2 (06/11): ambas as rodadas marcavam isolamento técnico como NÃO
+COMPROVADO e o carregamento nativo permanecia pendente. A atualização R4 de
+10/11, acima, substitui esse estado: PV-05 e PV-07 concluídos. A autorização de
+dois commits não autorizou push; nenhum commit/push/operação Git foi feito em R3/R4.

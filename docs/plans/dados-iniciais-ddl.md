@@ -26,7 +26,7 @@ Não executar SQL avulso nem alterar migrations anteriores.
 
 ## Contrato proposto de image
 
-Objeto com provider (pexels enquanto não houver decisão de troca), sourceId
+Objeto com provider (pixabay, conforme DEC-30), sourceId
 como string, sourceUrl, photographer, photographerUrl, licenseUrl,
 licenseCheckedAt (data ISO), bucket, objectKey, width 800, height 600 e sha256.
 A referência pública é derivada do endereço público do Storage, bucket e chave;

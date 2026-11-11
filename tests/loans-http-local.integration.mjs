@@ -121,11 +121,18 @@ test("EMP-01/02/08 — cookie HTTP consulta catálogo e registra empréstimo loc
     const ownLoans = await resultData(finalLoansResponse);
     assert.ok(ownLoans.some((loan) => loan.id === loanId));
 
-    const forgedResponse = await mutation("inventory.loans.request", {
-      equipmentId,
-      borrowerId: randomUUID(),
-    }, cookie);
-    assert.ok(forgedResponse.status >= 400);
+    for (const extra of [
+      { borrowerId: randomUUID() }, { tenantId: randomUUID() },
+      { dueAt: "2030-01-01T00:00:00Z" }, { status: "DEVOLVIDO" },
+      { requestedAt: "2026-01-01T00:00:00Z" },
+    ]) {
+      const forgedResponse = await mutation("inventory.loans.request", { equipmentId, ...extra }, cookie);
+      assert.equal(forgedResponse.status, 400);
+      const errorBody = await forgedResponse.json();
+      assert.ok(JSON.stringify(errorBody).includes("BAD_REQUEST"));
+    }
+    assert.equal(await database.loan.count({ where: { equipmentId } }), 1);
+    assert.equal((await database.equipment.findUniqueOrThrow({ where: { id: equipmentId } })).status, "EMPRESTADO");
   } finally {
     if (loanId) await database.loan.deleteMany({ where: { id: loanId } });
     if (equipmentId) await database.equipment.deleteMany({ where: { id: equipmentId } });

@@ -1,5 +1,12 @@
 # Dados iniciais da prática
 
+Atualização 11/11 (DEC-35): a usuária aprovou visualmente as 12 fotos do
+manifesto integral `.cache/imagens/manifesto-candidatos.json`. Há 12 registros,
+12 patrimônios distintos e 12 arquivos presentes. Substitui os snapshots de
+aceite visual parcial abaixo, preservados como histórico. As quatro fontes
+externas/ressalvas da DEC-34 continuam sem prova de conformidade integral;
+este aceite não altera automaticamente o contrato técnico nem aprova DADOS-04.
+
 Estado: contrato aprovado para execução local; implementação parcial.
 Não aprova critérios por antecipação nem autoriza escrita em produção.
 [Plano](../plans/dados-iniciais.md) · [Tarefas](../tasks/dados-iniciais.md).
@@ -54,8 +61,11 @@ refere-se ao lote esperado, sem autorizar apagar outros equipamentos existentes.
   Empréstimos preexistentes não são apagados para fabricar o aceite de zero.
 - Senha ou chave nunca entra em código, argumento de comando, manifesto ou log.
 - Foto real deve ter 800 x 600, ID e conteúdo distintos, créditos e revisão visual.
-  Preparação segue a [skill](../../skills/imagens-equipamentos/SKILL.md).
-  Falta de chave não autoriza mudar de fonte silenciosamente.
+  Pixabay foi autorizado pelo professor segundo a usuária (DEC-30). Em 11/11,
+  a usuária autorizou buscar quatro itens em fontes externas (DEC-34); a
+  autorização do professor para essas fontes não foi informada. Preservar
+  licença, autoria, origem e revisão visual por foto. A chave privada está
+  configurada localmente e não deve ser registrada neste repositório.
 - Agente testa somente local. Banco e Storage de produção são escritos pelo usuário.
 
 ## Contrato operacional aprovado em 06/11/2026
@@ -71,10 +81,13 @@ refere-se ao lote esperado, sem autorizar apagar outros equipamentos existentes.
 
 Modelo de foto, comparação, bucket/chave e etapas retomáveis foram aprovados
 no documento de DDL abaixo. Vínculo e orquestração local foram implementados e
-testados com identidades sintéticas. Aquisição de fotos reais está bloqueada
-pela pausa oficial de chaves Pexels; a identidade do professor será conferida
-somente na execução autorizada, sem publicar senha. Não preencher lacunas por
-inferência.
+testados com identidades sintéticas. O adaptador e validadores Pixabay foram
+testados; em 11/11 a chave local foi configurada e oito candidatos PNG 800×600
+foram aprovados visualmente (DEC-31/32). O manifesto local de 12 candidatos
+está em `.cache/imagens/manifesto-candidatos.json` (DEC-34); quatro fotos
+externas aguardam revisão e duas apresentam ressalvas visuais explícitas.
+Revisão visual humana, Storage e identidade real do professor seguem pendentes.
+Não publicar senha nem preencher lacunas por inferência.
 
 ## Fluxo operacional
 

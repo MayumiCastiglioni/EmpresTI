@@ -1,68 +1,72 @@
-# Manifesto e validação
+# Manifesto e validação — Pixabay
 
-## Fontes verificadas em 07/11/2026
+## Fonte e condições consultadas em 11/11/2026
 
-- [API Pexels](https://www.pexels.com/api/documentation/): autenticação por
-  Authorization, busca e recurso Photo. As diretrizes da API pedem link
-  destacado para Pexels e crédito ao fotógrafo quando possível.
-- [Help Center — chave API](https://help.pexels.com/hc/en-us/articles/900004904026-How-do-I-get-an-API-key):
-  atualização de 07/11/2026 informa que a emissão de novas chaves está pausada.
-  Esse aviso prevalece sobre a instrução genérica da documentação de que a chave
-  é emitida imediatamente. Aquisição pela API fica bloqueada até a reabertura;
-  não usar acesso direto à página como substituição.
-- [Licença Pexels](https://www.pexels.com/license/): registrar a fonte vigente.
-  A ausência de obrigatoriedade geral de atribuição na licença não elimina
-  as diretrizes específicas de uso da API nem o contrato da atividade.
+- [API Pixabay](https://pixabay.com/api/docs/): exige chave no parâmetro `key`.
+  Respostas de busca precisam ser cacheadas por 24 horas; não fazer downloads
+  sistemáticos em massa. URLs de imagem não podem ser hospedadas por hotlink
+  permanente: baixar o arquivo e servir a cópia aprovada no Storage do projeto.
+  Se a aplicação exibir resultados de busca, informar que as imagens são do
+  Pixabay.
+- [Licença Pixabay](https://pixabay.com/service/license-summary/): atribuição
+  do autor não é obrigatória, mas é apreciada; verificar direitos de terceiros,
+  marcas/logos e usos proibidos. Para rastreabilidade e conforme DEC-30, o
+  catálogo manterá crédito com nome do autor e link para Pixabay.
+- [Termos Pixabay](https://pixabay.com/service/terms/): a licença resumida
+  não substitui a licença completa nem libera uso de marca, imagem de pessoa ou
+  propriedade sem verificar direitos adicionais.
+- [Pexels — emissão de chave](https://help.pexels.com/hc/en-us/articles/900004904026-How-do-I-get-an-API-key):
+  conferida em 11/11; novas chaves continuam pausadas. DEC-30 substitui essa
+  fonte pelo Pixabay após autorização formal do professor informada pela usuária.
 
 ## Registro por equipamento
 
-O manifesto deverá conter: patrimônio, tipo, consulta utilizada, ID Pexels,
-URL da página da foto, nome e URL do fotógrafo, URL e data de consulta da
-licença, caminho local final, largura/altura decodificadas, SHA-256,
-responsável/data da revisão visual, estado e motivos de rejeição quando houver.
-Não guardar cabeçalhos de autenticação ou respostas contendo credenciais.
+O manifesto deverá conter: patrimônio, tipo, consulta de busca, ID Pixabay,
+URL da página da imagem (`pageURL`), nome do autor, URL de perfil, URL/data da
+licença consultada, arquivo original baixado (para auditoria local), caminho
+final PNG, largura/altura decodificadas, SHA-256, responsável/data da revisão
+visual, estado e motivos de rejeição. Não guardar chave, cabeçalho ou URL de API
+que contenha a chave. Não usar URLs temporárias CDN como origem permanente.
 
-Registrar também candidatos rejeitados, sem incluí-los no lote aprovado.
-Uma mesma foto recortada de duas formas não é duas fotos distintas: conferir
-unicidade tanto por ID Pexels quanto por hash final. Revisão visual deve
-identificar fotos diferentes mas praticamente iguais; hash não detecta isso.
+Registrar candidatos rejeitados separadamente, sem incluí-los no lote aprovado.
+Uma mesma foto recortada de duas formas não constitui duas fotos distintas:
+conferir unicidade do ID e do hash. Revisão visual também deve identificar fotos
+diferentes mas praticamente iguais; hash não detecta semelhança visual.
 
-## Checks a implementar após aprovação da ferramenta
+## Checks
 
-- Decodificar os arquivos reais e rejeitar dimensões diferentes de 800 x 600.
-- Conferir conjunto exato dos patrimônios aprovados, sem falta ou duplicação.
-- Rejeitar IDs Pexels repetidos e conteúdo final com mesmo hash.
-- Rejeitar metadados/créditos ausentes e arquivos sem revisão visual aprovada.
-- Falhar de forma explícita para arquivo corrompido ou candidato inadequado.
+- Decodificar arquivos e rejeitar dimensões diferentes de 800 x 600.
+- Conferir o conjunto exato dos 12 patrimônios, sem falta ou duplicação.
+- Rejeitar IDs Pixabay repetidos e conteúdo final com hash repetido.
+- Exigir metadados de origem/crédito e aprovação de revisão visual humana.
+- Rejeitar arquivos corrompidos ou imagens com pessoas, marcas/logos, texto ou
+  telas legíveis, conforme o enunciado.
 - Reexecutar preparação sem sobrescrever arquivo diferente silenciosamente.
 
-Usar chave de objeto estável por patrimônio e versão/hash acordados na spec.
-Na reexecução, conteúdo igual deve ser reaproveitado; divergência deve ser
-mostrada para decisão humana. O bucket público, caminhos finais e política
-de atualização dependem da spec de dados; não inventar esses contratos aqui.
+A chave de Storage continua estável por patrimônio/hash. Na reexecução,
+conteúdo igual é reaproveitado; divergência exige revisão humana. Bucket,
+caminhos e política já estão definidos na spec de dados. Upload permanece
+responsabilidade humana.
 
 ## Execução local
 
-Da raiz do projeto:
+O script local `scripts/buscar-pixabay.mjs` pesquisa e baixa um ID por vez. O
+suporte Pixabay foi aplicado aos validadores; ainda depende de chave local,
+imagens reais e revisão visual para produzir um manifesto de entrega aprovado.
 
-```text
-node skills/imagens-equipamentos/scripts/preparar.mjs preparar origem.jpg destino.png
-node skills/imagens-equipamentos/scripts/preparar.mjs validar manifesto.json diretorio-das-fotos
-node --test skills/imagens-equipamentos/scripts/preparar.test.mjs
-```
+O fluxo é: consultas pontuais pela API com respostas cacheadas por 24h; selecionar
+resultados manualmente; baixar somente cada candidato escolhido; preparar com
+Sharp; preencher manifesto; revisar visualmente; validar IDs, hashes, dimensões
+e créditos. A chave fica em `.env.local`, nunca na linha de comando, manifesto,
+cache, logs ou Vercel.
 
-O diretório de destino deve existir. Arquivos são locais, sem upload ou rede.
-Manifesto JSON: objeto com patrimoniosEsperados (lista de strings) e fotos.
-Cada foto usa patrimonio, tipo, consulta, pexelsId (inteiro), origem, fotografo,
-fotografoUrl, licencaUrl, licencaConsultadaEm, arquivo, largura, altura, sha256
-mais revisao com estado aprovada, responsavel e data. URLs Pexels são conferidas
-por domínio; o script não verifica sua existência ou prova aquisição pela API.
-Use caminhos locais revisados: o utilitário não é uma barreira de isolamento
-para manifestos não confiáveis. Rejeições visuais ficam em registro separado.
+## Estado atual e limites — 11/11/2026
 
-## Evidências e limites
-
-Teste com imagens sintéticas exercita tamanho real, reutilização, recusa de
-sobrescrita, duplicatas, créditos ausentes, revisão pendente e entrada corrompida.
-Não há chave consultada, foto real baixada, revisão visual ou upload executado.
-Não confundir aprovação desse teste com aceite da PRA-03 ou das fotos.
+A chave está configurada localmente e houve consultas e downloads individuais.
+Oito candidatos reais foram preparados em PNG 800×600 e aprovados visualmente
+pela usuária (DEC-31/32); quatro patrimônios
+seguem sem foto adequada. Os metadados
+e as rejeições estão no manifesto parcial local
+`.cache/pixabay/manifesto-candidatos.json`. Nenhuma foto entrou no catálogo
+ou foi enviada ao Storage. DADOS-04/PRA-03
+continuam abertas; os testes sintéticos não substituem essas evidências.

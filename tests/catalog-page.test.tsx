@@ -25,6 +25,54 @@ const availableItem = {
 };
 
 describe("EMP-T07 — catálogo e empréstimos do colaborador", () => {
+  it.each([false, true])("EMP-09/EMP-10 atualiza consultas após indisponibilidade, falha de atualização=%s", async (refreshFails) => {
+    const message = "Este equipamento não está mais disponível. Atualize o catálogo.";
+    api.inventory.loans.request.mutate.mockRejectedValueOnce(new Error(message));
+    render(<CatalogoPage />);
+    fireEvent.click(await screen.findByRole("button", { name: /Solicitar empréstimo de Notebook de teste/ }));
+    if (refreshFails) api.inventory.catalog.list.query.mockRejectedValueOnce(new Error("private details"));
+    else api.inventory.catalog.list.query.mockResolvedValueOnce([{ ...availableItem, status: "EMPRESTADO" }]);
+    fireEvent.click(screen.getByRole("button", { name: "Confirmar solicitação" }));
+    await waitFor(() => expect(api.inventory.catalog.list.query).toHaveBeenCalledTimes(2));
+    expect(api.inventory.loans.mine.query).toHaveBeenCalledTimes(2);
+    expect(screen.getByText(message)).toBeInTheDocument();
+    expect(screen.queryByText(/Empréstimo iniciado/)).not.toBeInTheDocument();
+    if (refreshFails) {
+      expect(await screen.findByText(/Não foi possível atualizar as listas/)).toBeInTheDocument();
+      expect(screen.queryByText("private details")).not.toBeInTheDocument();
+    } else {
+      expect(await screen.findByText("Emprestado")).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /Solicitar empréstimo de/ })).not.toBeInTheDocument();
+    }
+  });
+  it("EMP-09 mostra carregamento, recupera falha e explica catálogo vazio", async () => {
+    api.inventory.catalog.list.query.mockImplementationOnce(() => new Promise(() => {}));
+    const first = render(<CatalogoPage />);
+    expect(screen.getByText(/Carregando catálogo/)).toBeInTheDocument();
+    first.unmount();
+    api.inventory.catalog.list.query.mockRejectedValueOnce(new Error("private database details"));
+    render(<CatalogoPage />);
+    expect(await screen.findByRole("alert")).not.toHaveTextContent("private database details");
+    api.inventory.catalog.list.query.mockResolvedValue([]);
+    fireEvent.click(screen.getByRole("button", { name: "Tentar novamente" }));
+    expect(await screen.findByText("Nenhum equipamento cadastrado.")).toBeInTheDocument();
+    expect(screen.getByText("Você ainda não tem empréstimos.")).toBeInTheDocument();
+  });
+
+  it("EMP-09 impede reenvio durante a mutation e mantém o estado até confirmar", async () => {
+    let complete!: (value: unknown) => void;
+    api.inventory.loans.request.mutate.mockImplementationOnce(() => new Promise((resolve) => { complete = resolve; }));
+    render(<CatalogoPage />);
+    fireEvent.click(await screen.findByRole("button", { name: /Solicitar empréstimo de Notebook de teste/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirmar solicitação" }));
+    expect(screen.getByRole("button", { name: /Registrando/ })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Cancelar" })).toBeDisabled();
+    expect(api.inventory.catalog.list.query).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText(/Empréstimo iniciado/)).not.toBeInTheDocument();
+    complete({ dueAt: "2026-11-28T02:59:59.000Z" });
+    expect(await screen.findByRole("status")).toHaveTextContent("Empréstimo iniciado");
+    expect(api.inventory.loans.request.mutate).toHaveBeenCalledTimes(1);
+  });
   beforeEach(() => {
     vi.clearAllMocks();
     api.inventory.catalog.list.query.mockResolvedValue([availableItem]);

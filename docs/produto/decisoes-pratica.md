@@ -1,5 +1,50 @@
 # Decisões e pendências da prática
 
+## DEC-35 — aprovação visual integral das fotos — 11/11/2026
+
+Origem/responsável: usuária, instrução explícita "declare todas as fotos como
+aprovadas". Alternativas: manter quatro aceites visuais pendentes ou aprovar o
+lote integral atual. Escolha: aprovar visualmente as 12 fotos de TI-0001 a
+TI-0012 em `.cache/imagens/manifesto-candidatos.json`. Motivo: não informado.
+Estado: aceite humano registrado por foto; substitui a pendência de aceite
+visual da DEC-34. Aprovações anteriores e ressalvas técnicas foram preservadas
+no manifesto. O manifesto Pixabay é um snapshot histórico parcial; o lote
+integral atual está no manifesto de imagens, com fontes mistas.
+Não equivale a autorização do professor para novas fontes, validação técnica,
+conformidade integral com o enunciado, upload ou aceite DADOS-04. As ressalvas
+de adequação dos itens e compatibilidade dos validadores continuam explícitas.
+Sem alterações de runtime, Git ou escrita remota; não commitado.
+
+## DEC-ENVIO-IMEDIATO — 11/11/2026
+
+Origem/responsável: usuária pediu fechamento para envio em menos de um minuto e
+informou manifesto concluído na conversa de fotos. Alternativas: aguardar todos
+os gates ou preparar envio imediato com limitações explícitas. A solicitação é
+preparar envio imediato; motivo informado: precisa enviar o projeto agora.
+Estado: documentação de envio atualizada, sem aceite integral nem dispensa de
+validação. O manifesto de candidatos local ainda informa oito aprovações;
+artefato final não identificado nesta sessão. Não substituir evidência ausente
+por aprovação presumida. Testes padrão 85/85, componente 7/7, lint e TypeScript
+passaram; builds/integrações/produção mantêm os bloqueios documentados.
+Não houve operação Git, escrita remota ou tag; registro não commitado.
+
+## DEC-FECH-234 — escopo de fechamento — 11/11/2026
+
+Origem/responsável: solicitação explícita da usuária para executar partes 2, 3
+e 4; parte 1 fica em outra conversa. Alternativas: fechar só os critérios locais
+ou avançar também na validação real/publicação. Escolha: trabalhar nas três
+partes solicitadas, mantendo os gates e evidências do plano existente. Motivo
+informado: parte das fotos já está sendo feita por outra conversa.
+Estado: autorização de tarefa recebida, execução parcial, não aceite final.
+O agente ampliou testes e corrigiu atualização das consultas após conflito
+conforme DEC-24 (implementação, sem nova regra de negócio). Conexão de testes
+locais foi bloqueada com EACCES; dados reais e produção não foram alterados.
+Decisão operacional do agente: não contornar guardas locais nem antecipar
+publicação/tag com revisões NÃO PRONTA. Evidências e pré-requisitos em
+[fechamento 2–4](../verificacao/fechamento-2-4.md),
+[EMP-R2](../verificacao/emprestimos-r2.md) e
+[DADOS-R3](../verificacao/dados-iniciais/r3.md). Não commitado; nenhum Git executado.
+
 Data: 06/11/2026. Registro da PRA-01 do
 [plano prioritário](../plans/pratica-sdd-subagentes.md).
 Fonte de negócio: [PRD](../PRD.md). Este registro não é ADR nem aceite de código.
@@ -23,11 +68,10 @@ sem apagar seu escopo futuro no PRD.
 - PRAT-C04: regras de segredos continuam proibindo senha em código/Git.
   Proposta a detalhar na spec de dados: entrada privada na execução humana,
   sem senha literal, log ou reprodução deste valor no ENTREGA.md.
-- PRAT-C05: verificador continua impedido de corrigir testes. R1 detectou o erro e não o corrigiu; R2 aprovou a fixture restaurada.
-  Prova versionada em commits locais `12aa161` e `d8bdcbb`; isolamento técnico e carregamento nativo permanecem pendentes em PRA-02.
-- PRAT-C06: usuária aceitou manter crédito se necessário; preservar Fotos: Pexels
-  com link para fotos dessa fonte. Alternativa Pixabay e aprovação da troca
-  permanecem pendentes; não atribuir fotos Pixabay ao Pexels.
+- PRAT-C05: verificador continua impedido de corrigir testes. R1 detectou o erro e não o corrigiu; R2 aprovou a fixture restaurada. R4 comprovou descoberta nativa e isolamento MXC read-only para a fixture (1/1); evidência: `docs/verificacao/prova-verificador/resultado.md`. A prova versionada em commits locais `12aa161` e `d8bdcbb` continua sem push. DEC-28 registra a configuração operacional e seus limites.
+- PRAT-C06: em 11/11, a usuária confirmou autorização formal do professor para
+  usar Pixabay nas 12 fotos. Manter crédito do autor e link Pixabay para
+  rastreabilidade; fotos, manifesto e implementação da fonte seguem pendentes.
 - PRAT-C07: sharp autorizado pela usuária em 06/11 para processamento local;
   registrar instalação e validação abaixo. ADR será atualizado pelo time.
 
@@ -60,8 +104,8 @@ fica com o time, sem edição pelo agente.
 Usuária informou dificuldade de obter imagens Pexels e proposta de usar Pixabay;
 aceitou manter crédito caso necessário. Não foi apresentado erro técnico,
 resposta de API ou confirmação do professor alterando o contrato Pexels.
-A alternativa Pixabay fica registrada para avaliação, sem substituição silenciosa
-na entrega. O crédito exigido no uso da API Pexels será preservado.
+A alternativa Pixabay ficou pendente até a confirmação formal do professor em
+11/11. A decisão atual consta em DEC-30; o crédito de autor/fonte será preservado.
 
 Fontes consultadas em 06/11:
 - https://www.pexels.com/api/documentation/ — diretrizes pedem link para Pexels.
@@ -74,9 +118,14 @@ Próximo diagnóstico: obter mensagem/código de erro ou etapa em que a aquisiç
 Pexels falha, sem expor chave. Nenhuma falha autenticada foi reproduzida pelo agente.
 
 Usuária esclareceu: bloqueio na criação da chave Pexels; não conseguem gerá-la.
-Não é erro de busca/download reproduzido. Aquisição autenticada fica pendente.
-Ainda sem confirmação de autorização do professor para Pixabay ou disponibilidade
-de chave desse serviço. Não tentar contornar autenticação ou usar chave alheia.
+Não é erro de busca/download reproduzido. A aquisição Pexels fica pendente; a
+alternativa Pixabay foi aprovada depois por DEC-30. Não contornar autenticação
+nem usar chave alheia.
+
+Atualização factual em 11/11/2026: o Help Center oficial da Pexels foi conferido
+novamente e continua informando que a emissão de novas chaves está pausada. A
+checagem do workspace não encontrou fotos reais nem manifesto do lote. [Fonte
+oficial](https://help.pexels.com/hc/en-us/articles/900004904026-How-do-I-get-an-API-key).
 
 Sharp 0.35.5 registrado em devDependencies e package-lock.json. Instalação
 concluída (saída 0); teste em memória decodificou saída PNG com 800 x 600.
@@ -147,12 +196,12 @@ Motivos que não foram informados não devem ser inventados na entrega.
 | DEC-09 | 06/11/2026 | Confirmação normal de e-mail, sem confirmação automática | Spec dados; implementação local respeita |
 | DEC-10 | 06/11/2026 | Reaproveitar iguais, parar/reportar divergências; não apagar empréstimos | Spec dados; teste local, produção pendente |
 | DEC-11 | 06/11/2026 | sharp autorizado para processamento local | PRAT-C07; instalado/testado, ADR a cargo do time |
-| DEC-12 | 06/11/2026 | Manter crédito quando necessário | PRAT-C06; Pexels com link, tela pendente |
+| DEC-12 | 06/11/2026 | Manter crédito do autor e origem quando necessário | Atualizado para Pixabay em DEC-30; tela ainda precisa refletir o provedor |
 | DEC-13 | 06/11/2026 | image JSONB opcional com check de objeto | DDL aprovado e migration local aplicada |
 | DEC-14 | 06/11/2026 | tenant+patrimônio; comparar nome/categoria/situação/metadados | Contrato DDL aprovado; testes locais |
 | DEC-15 | 06/11/2026 | equipment-images e chave empresti/patrimonio/sha256.png | Contrato aprovado; upload real humano pendente |
 | DEC-16 | 06/11/2026 | Etapas Auth/Storage retomáveis, sem compensação destrutiva automática | Contrato aprovado; Storage real não executado |
-| DEC-17 | 06/11/2026 | Anotar pendências do verificador e continuar trabalho independente | PRA-02 diferida, não aceita como concluída |
+| DEC-17 | 06/11/2026 | Anotar pendências do verificador e continuar trabalho independente | Retomada técnica fechada só para fixture em DEC-28; specs de produto permanecem pendentes |
 | DEC-18 | 06/11/2026 | Registrar decisões e revisar pegadinhas como regra | Pedido explícito; AGENTS/rules/checklist atualizados |
 | DEC-19 | 06/11/2026 | Usar somente os nove feriados nacionais fixos | Decisão aprovada; cálculo isolado implementado, integração pendente |
 | DEC-20 | 06/11/2026 | Cálculo puro determinístico, sem consulta externa por solicitação | Decisão operacional do agente; calendário isolado testado |
@@ -162,9 +211,20 @@ Motivos que não foram informados não devem ser inventados na entrega.
 | DEC-24 | 08/11/2026 | Recusar reenvio para equipamento já emprestado | Documentada; implementação pendente |
 | DEC-26 | 10/11/2026 | Remover policy UPDATE de empréstimos para OPERACOES/ADMIN nesta fatia | Policy removida no banco local pela migration DEC-27 |
 | DEC-27 | 10/11/2026 | Aprovar o DDL EMP-T04 após teste isolado e aplicá-lo localmente | Migration aplicada; suíte, lint e build passaram; fluxo completo pendente |
+| DEC-28 | 10/11/2026 | Registrar agente verificador nativo e executá-lo sob MXC read-only | R4 passou 1/1 somente na fixture; sem prova de produção |
+| DEC-29 | 11/11/2026 | Compilar a partir do OneDrive em cópia temporária externa, mantendo Next padrão | `npm run build:isolated` passou; `npm run build` segue para CI/Vercel |
+| DEC-30 | 11/11/2026 | Usar API Pixabay nas 12 fotos, com autorização formal do professor informada pela usuária | Fonte aprovada; chave local configurada; oito fotos aprovadas em DEC-31/32, quatro sem candidato adequado |
+| DEC-31 | 11/11/2026 | Aprovar visualmente as seis fotos candidatas apresentadas | TI-0003/0004/0005/0008/0009/0010 aprovadas; DEC-32 aprovou mais duas |
+| DEC-32 | 11/11/2026 | Aprovar visualmente as fotos de TI-0001/0002 | Oito aprovadas no total; TI-0006/0007/0011/0012 ainda sem candidato adequado |
+| DEC-33 | 11/11/2026 | Manter somente Pixabay na busca das quatro fotos restantes | Confirmado pela usuária; quatro itens ainda pendentes após nova rodada de busca |
+| DEC-34 | 11/11/2026 | Buscar as quatro fotos restantes em fontes externas e registrar a limitação da busca Pixabay | Substitui DEC-33; manifesto de 12 candidatos preenchido, quatro sem aceite visual |
 
-Proposta pendente: Pixabay diante de impossibilidade de gerar chave Pexels.
-Não é decisão aprovada de troca da fonte exigida na atividade.
+DEC-30 resolve a escolha da fonte: Pixabay foi autorizado formalmente pelo
+professor, segundo confirmação da usuária em 11/11. A proposta não está mais
+pendente; chave local, implementação, fotos reais, manifesto, revisão visual e
+Storage continuam pendentes. O plano técnico está em
+[adaptacao-pixabay.md](../plans/adaptacao-pixabay.md) e aguarda aprovação antes
+de código, conforme as restrições do projeto.
 Tratamentos vigentes de senha e autocorreção seguem regras existentes; não
 apresentar como nova autorização de exceção. Registro de ADR só pelo time.
 
@@ -298,3 +358,133 @@ migration `20261110122729_loan_immediate_limit_five_policies`; SQL testado em
 Postgres descartável 17.11; `npm test` 78/78, lint e build passaram. O produto
 end-to-end, runtime/RLS privilegiado e ambiente de produção não foram validados.
 Evidências: `docs/validacao-emp-t04-loans.md`.
+
+## DEC-28 — configuração local isolada do verificador — 10/11/2026
+
+Origem/responsável: escolha operacional do agente para concluir PRA-02 dentro
+do contrato aprovado; não é decisão de produto nem aprovação humana adicional.
+Alternativas consideradas: manter apenas instruções textuais; ampliar permissões
+do agente; ou registrar configuração e executar em sessão restrita. Escolha:
+registrar o papel em `.codex/config.toml` apontando para
+`.codex/agents/verificador-spec.toml`, ignorar a configuração pessoal na sessão
+de prova e executar sob perfil MXC read-only, com rede, apps/plugins e MCPs
+desativados, ambiente filtrado e negações efetivas de escrita, perfil, `.env*`
+e TCP. Para contornar o diretório inicial do shell sem ampliar permissões, o
+Node foi iniciado diretamente com o diretório de trabalho do repositório e
+preservação de links.
+
+Motivo técnico: a documentação oficial do Codex define que `config_file` é
+resolvido relativamente ao arquivo que declara o agente e permite configuração
+de projeto; perfis de permissão e MXC oferecem restrições efetivas de arquivo e
+rede. Fontes: [subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents),
+[referência de configuração](https://learn.chatgpt.com/docs/config-file/config-reference),
+[permissões](https://learn.chatgpt.com/docs/permissions) e
+[Windows sandbox](https://learn.chatgpt.com/docs/windows/windows-sandbox).
+Estado: descoberta nativa confirmada na R4; teste permitido passou 1/1; provas
+de escrita/acesso ao perfil/`.env*` retornaram EPERM e TCP retornou EACCES.
+Arquivos de configuração e documentação estão apenas locais, ainda sem commit;
+nenhum push, deploy, serviço remoto ou alteração da fixture ocorreu na R4.
+Escopo: conclui PRA-02 somente para a fixture técnica; não aprova specs de
+produto nem certifica isolamento/segurança de produção.
+
+## DEC-29 — procedimento de build local fora do OneDrive — 11/11/2026
+
+Origem/responsável: decisão operacional do agente ao executar o tópico 2 do
+planejamento trazido pela usuária; não altera stack nem configuração de produção.
+Alternativas: alterar a configuração global do OneDrive, manter `distDir: build`,
+documentar apenas uma cópia manual ou automatizar a cópia temporária. Escolha:
+manter `next.config.ts` no padrão `.next` e adicionar `npm run build:isolated`,
+que compila uma cópia temporária fora do OneDrive. `npm run build` continua sendo
+o caminho padrão da CI/Vercel.
+
+Motivo técnico: o erro local ocorre ao limpar saída com atributos especiais na
+pasta sincronizada; mudar `distDir` já divergiu da convenção esperada pela
+Vercel. A cópia temporária evita a pasta afetada sem mover o projeto nem alterar
+o deploy. Implementação em `scripts/build-isolated.mjs` e `package.json`.
+Validação: `npm run build:isolated` passou em 11/11; Prisma Client, compilação
+Next.js 16.4.6, TypeScript e sete rotas passaram. Foram instalados 614 pacotes
+na cópia temporária, removida ao final. Nenhum `.env*` foi copiado; as variáveis
+locais foram carregadas em memória. npm reportou avisos de scripts de três
+pacotes pendentes de aprovação e avisos de obsolescência, sem falha de build.
+Estado: procedimento operacional implementado e validado, arquivos locais sem
+commit. Não modifica fontes, OneDrive, banco, CI ou Vercel.
+
+## DEC-30 — fonte Pixabay aprovada para as fotos iniciais — 11/11/2026
+
+Origem/responsável: resposta explícita da usuária informando que obteve
+autorização formal do professor para usar Pixabay como alternativa para as
+12 fotos. Alternativas: aguardar reabertura de chaves Pexels, usar Pixabay com
+essa autorização, ou manter fotos reais pendentes. Escolha: usar a API Pixabay
+para adquirir as 12 fotos reais do lote. Motivo registrado: a usuária já havia
+informado que não consegue criar chave Pexels; o Help Center confirmou em 11/11
+que a emissão de novas chaves segue pausada.
+
+Crédito: manter nome do autor e link Pixabay para rastreabilidade e conforme a
+preferência anterior da usuária de manter crédito quando necessário. A licença
+Pixabay não exige atribuição, mas a API pede identificar a origem quando
+resultados de busca forem exibidos; o catálogo do projeto exibirá foto do item,
+não resultados de busca. Não declarar atribuição como obrigação legal.
+
+Requisitos técnicos consultados na [API Pixabay](https://pixabay.com/api/docs/),
+na [licença](https://pixabay.com/service/license-summary/) e nos
+[termos](https://pixabay.com/service/terms/): chave obrigatória na consulta,
+cache de respostas por 24 horas, sem downloads sistemáticos em massa e sem
+hotlink permanente; baixar localmente e publicar no Storage do projeto. A chave
+deve permanecer privada e nunca aparecer em logs, manifestos, URL registrada ou
+cliente web. Estado: fonte aprovada; adaptador e validadores locais implementados
+e testados em 11/11. Em atualização de 11/11, a chave foi configurada localmente
+e oito candidatos PNG foram aprovados visualmente (DEC-31/32); quatro patrimônios ainda não têm foto
+adequada. Não houve upload. Próxima etapa:
+completar as fotos faltantes, revisar o manifesto e obter aprovação humana antes
+do uso no catálogo. Nenhuma migration é necessária:
+`image` já guarda provedor e metadados em JSONB. Evidências e pendências estão
+no [plano técnico](../plans/adaptacao-pixabay.md).
+
+## DEC-31 — aceite visual parcial das fotos — 11/11/2026
+
+Origem e responsável: aprovação explícita da usuária nesta conversa, após
+apresentação das seis prévias. Alternativas: aprovar ou rejeitar cada candidata;
+a usuária respondeu “aprovado” para o conjunto. Motivo: não informado.
+Aplicação: TI-0003, TI-0004, TI-0005, TI-0008, TI-0009 e TI-0010 estão
+registradas como visualmente aprovadas no manifesto local de candidatos.
+TI-0001, TI-0002, TI-0006, TI-0007, TI-0011 e TI-0012 ainda não têm foto
+adequada. Não há manifesto completo, Storage validado nem aceite DADOS-04.
+Estado Git: não commitado. Não houve escrita remota.
+
+## DEC-32 — aceite visual de mais dois notebooks — 11/11/2026
+
+Origem e responsável: aceite explícito da usuária nesta conversa após as
+prévias de TI-0001 e TI-0002. Alternativas: aprovar ou rejeitar cada foto.
+Escolha: aprovar as duas propostas Pixabay, IDs 593327 e 1478822. Motivo: não
+informado. Os PNGs 800×600, créditos, IDs e hashes estão no manifesto parcial
+local `.cache/pixabay/manifesto-candidatos.json`; os arquivos aprovados foram
+guardados em `.cache/pixabay/review-ready/` sem sobrescrever os arquivos
+anteriores. Estado: oito fotos visualmente aprovadas no total. TI-0006,
+TI-0007, TI-0011 e TI-0012 seguem sem foto adequada; manifesto integral,
+Storage e catálogo não validados. Não houve escrita remota nem operação Git.
+
+## DEC-33 — manter Pixabay como única fonte nesta busca — 11/11/2026
+
+Origem/responsável: resposta explícita da usuária nesta conversa à consulta
+sobre as quatro fotos restantes. Alternativas apresentadas: fotos próprias,
+outra fonte autorizada pelo professor ou continuar somente no Pixabay.
+Escolha: continuar somente no Pixabay. Motivo: não informado.
+Estado: consultas pontuais adicionais e inspeção visual não encontraram fotos
+adequadas para TI-0006, TI-0007, TI-0011 e TI-0012. Os IDs rejeitados e motivos
+constam no manifesto parcial local. A busca pode continuar, mas a aprovação da
+fonte não comprova a existência de quatro fotos aptas nem libera o lote.
+
+## DEC-34 — fontes externas para os quatro itens restantes — 11/11/2026
+
+Origem/responsável: instrução explícita da usuária nesta conversa para buscar
+fora do Pixabay, registrar a limitação da busca e preencher o manifesto;
+substitui DEC-33. Alternativas: continuar buscando apenas no Pixabay, deixar os
+quatro itens sem foto ou buscar em fontes externas. Escolha: fontes externas.
+Motivo informado: concluir o manifesto rapidamente. As buscas documentadas no
+Pixabay não encontraram candidatos compatíveis; isso não prova inexistência em
+todo o acervo. A autorização do professor para fontes além do Pixabay não foi
+informada. Estado: 12 candidatos e 12 hashes distintos no manifesto local
+`.cache/imagens/manifesto-candidatos.json`; oito fotos têm aceite visual anterior
+e quatro aguardam aceite. A câmera de TI-0012 não representa bem uma câmera
+compacta e o monitor TI-0006 tem adesivo/etiquetas; substituir ou resolver essas
+ressalvas antes de DADOS-04. Nenhum upload ou operação Git ocorreu.

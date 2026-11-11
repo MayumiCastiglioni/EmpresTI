@@ -15,3 +15,18 @@ O enunciado pede dois commits para documentar erro/restauração. Após autoriza
 explícita da usuária em 06/11/2026, foram criados localmente 12aa161 (erro) e
 d8bdcbb (restauração), limitados aos arquivos da fixture. Não houve push.
 Hashes não substituem o isolamento técnico; permissões amplas não são somente leitura.
+
+## Atualização de execução — 10/11/2026
+
+R4 completou a prova sob uma sessão Codex isolada: descoberta nativa do agente
+registrado em .codex/config.toml, erro/restauração já documentados em R1/R2,
+nenhuma autocorreção e check final aprovado. No MXC, escrita no projeto,
+acesso ao perfil e a .env* foram negados (EPERM); a conexão TCP foi negada
+(EACCES). O perfil restringiu a leitura ao repositório, negou o restante do
+perfil, desligou a rede e usou ambiente core com variáveis de segredo filtradas.
+
+Como o shell interno iniciou em C:\ e não podia atravessar a pasta pessoal,
+o agente executou o mesmo check Node com WorkingDirectory no repositório e
+NODE_OPTIONS=--preserve-symlinks --preserve-symlinks-main. Os argumentos do
+teste permaneceram --test tests/fixtures/verificador-spec/status.test.mjs;
+1 teste passou. Não houve alteração na fixture nem operação Git nesta rodada.

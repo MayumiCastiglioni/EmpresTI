@@ -4,8 +4,8 @@ import { initialEquipment, preflightEquipment, type ExistingEquipment } from "..
 function photos() {
   return Object.fromEntries(initialEquipment.map(([tag],i) => {
     const sha256 = (i+1).toString(16).padStart(64,"0");
-    return [tag, { provider:"pexels", sourceId:String(i+1), sourceUrl:`https://www.pexels.com/photo/${i+1}/`,
-      photographer:"Autor sintético", photographerUrl:"https://www.pexels.com/@fixture/", licenseUrl:"https://www.pexels.com/license/",
+    return [tag, { provider:"pixabay", sourceId:String(i+1), sourceUrl:`https://pixabay.com/photos/fixture-${i+1}/`,
+      photographer:"Autor sintético", photographerUrl:`https://pixabay.com/users/fixture-${i+1}/`, licenseUrl:"https://pixabay.com/service/license-summary/",
       licenseCheckedAt:"2026-11-06", bucket:"equipment-images", objectKey:`empresti/${tag}/${sha256}.png`, width:800,height:600,sha256 }];
   }));
 }
@@ -44,7 +44,7 @@ describe("DAT-05A — pré-validação de equipamentos, sem escrita", () => {
     const sameContent=photos();sameContent["TI-0002"].sha256=sameContent["TI-0001"].sha256;
     sameContent["TI-0002"].objectKey=`empresti/TI-0002/${sameContent["TI-0002"].sha256}.png`;
     expect(preflightEquipment(sameContent,[]).status).toBe("blocked");
-    for (const patch of [{width:10},{licenseCheckedAt:"2026-02-30"},{sourceUrl:"https://evil.example/photo"},{photographer:""},{objectKey:"../file"},{token:"private"}]) {
+    for (const patch of [{provider:"pexels"},{width:10},{licenseCheckedAt:"2026-02-30"},{sourceUrl:"https://evil.example/photo"},{sourceUrl:"https://pixabay.com/"},{photographerUrl:"https://pixabay.com.evil.example/users/test-1/"},{licenseUrl:"https://pixabay.com/not-the-license/"},{photographer:""},{objectKey:"../file"},{token:"private"}]) {
       const invalid=photos();Object.assign(invalid["TI-0001"],patch);expect(preflightEquipment(invalid,[]).status).toBe("blocked");
     }
   });

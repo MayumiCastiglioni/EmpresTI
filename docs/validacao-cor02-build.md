@@ -3,6 +3,29 @@
 Data: 05/11/2026. Plano: [correções](plans/correcoes-aulas.md).
 Entrega técnica; não corresponde a aprovação dos CAs funcionais do MVP.
 
+## Atualização — 11/11/2026: build isolado fora do OneDrive
+
+A solução histórica que definiu `distDir: build` não é mais a configuração
+vigente. `next.config.ts` voltou ao padrão do Next (`.next`), necessário para
+manter compatibilidade com a Vercel; o Preview do commit `bc259e6` passou. O
+problema local é a limpeza de artefatos em uma pasta sincronizada e não exige
+alterar a configuração global do OneDrive.
+
+Decisão operacional: manter `npm run build` para CI/Vercel e disponibilizar
+`npm run build:isolated` para builds locais feitos a partir do OneDrive. O
+comando copia o código para uma pasta temporária fora do OneDrive, exclui
+artefatos gerados e arquivos `.env*`, carrega variáveis locais sem copiá-las,
+instala as dependências a partir do lockfile, executa o build normal e remove a
+cópia temporária ao final. A cópia é única e criada pelo comando; a pasta-fonte
+e sua saída não são apagadas.
+
+Validação em 11/11: `npm run build:isolated` concluiu com código 0; Prisma
+Client foi gerado, Next.js 16.4.6 compilou, TypeScript passou e as sete rotas
+foram geradas. A instalação mostrou avisos de scripts de três pacotes não
+aprovados pelo npm e avisos de obsolescência, mas não impediu o build. A pasta
+temporária foi removida pelo próprio comando. Nenhum arquivo `.env` foi
+copiado para ela. Configuração e relatório seguem locais, sem operação Git.
+
 ## Evidência e mudança
 
 npm run build reproduziu EPERM na limpeza de .next/server/app/api.

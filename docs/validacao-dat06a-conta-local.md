@@ -49,3 +49,7 @@ na tipagem desse teste; correção aplicada e repetição do build aprovada
 com saída zero, assim como repetição do lint.
 DAT-06 completa e CAs finais ainda não aprovados:
 faltam fluxo operacional, arquivos reais, integração com carga e revisão DAT-07.
+
+Atualização de teste — 11/11/2026: a fixture do empréstimo existente agora
+declara explicitamente `SOLICITADO`, o estado legado ativo aceito pelo contrato.
+`npm run test:initial-data-local` passou novamente: 3 arquivos/3 testes.

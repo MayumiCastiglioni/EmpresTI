@@ -16,9 +16,9 @@ test("IMG-01 IMG-02 IMG-03 IMG-04 — preparação local e validação do manife
   assert.equal((await sharp(destino).metadata()).width, 800);
   assert.equal((await sharp(destino).metadata()).height, 600);
   assert.equal((await preparar(entrada, destino)).reutilizado, true);
-  const foto = { patrimonio: "TI-0001", tipo: "monitor", consulta: "monitor", pexelsId: 1,
-    origem: "https://www.pexels.com/photo/1/", fotografo: "Autor fictício de teste",
-    fotografoUrl: "https://www.pexels.com/@teste/", licencaUrl: "https://www.pexels.com/license/",
+  const foto = { patrimonio: "TI-0001", tipo: "monitor", consulta: "monitor", pixabayId: 1,
+    origem: "https://pixabay.com/photos/monitor-1/", fotografo: "Autor fictício de teste",
+    fotografoUrl: "https://pixabay.com/users/teste-1/", licencaUrl: "https://pixabay.com/service/license-summary/",
     licencaConsultadaEm: "2026-11-06", arquivo: "final.png", largura: 800, altura: 600, sha256: result.sha256,
     revisao: { estado: "aprovada", responsavel: "fixture sintética", data: "2026-11-06" } };
   const manifesto = { patrimoniosEsperados: ["TI-0001"], fotos: [foto] };
@@ -26,8 +26,11 @@ test("IMG-01 IMG-02 IMG-03 IMG-04 — preparação local e validação do manife
   await assert.rejects(validar({ ...manifesto, fotos: [{ ...foto, revisao: null }] }, base), /visual/);
   await assert.rejects(validar({ ...manifesto, fotos: [{ ...foto, sha256: "invalido" }] }, base), /Hash/);
   await assert.rejects(validar({ ...manifesto, fotos: [{ ...foto, fotografo: "" }] }, base), /créditos/);
+  await assert.rejects(validar({ ...manifesto, fotos: [{ ...foto, pixabayId: 0 }] }, base), /ID Pixabay/);
+  await assert.rejects(validar({ ...manifesto, fotos: [{ ...foto, origem: "https://pixabay.com/" }] }, base), /Pixabay/);
   await assert.rejects(validar({ patrimoniosEsperados: ["TI-0001", "TI-0002"], fotos: [foto, { ...foto, patrimonio: "TI-0002" }] }, base), /duplicado/);
-  await assert.rejects(validar({ patrimoniosEsperados: ["TI-0001", "TI-0002"], fotos: [foto, { ...foto, patrimonio: "TI-0002", pexelsId: 2 }] }, base), /duplicado/);
+  await assert.rejects(validar({ patrimoniosEsperados: ["TI-0001", "TI-0002"], fotos: [foto, { ...foto, patrimonio: "TI-0002", pixabayId: 2 }] }, base), /duplicado/);
+  await assert.rejects(validar({ ...manifesto, fotos: [{ ...foto, origem: "https://evil.example/photo" }] }, base), /Pixabay/);
   await assert.rejects(validar({ ...manifesto, patrimoniosEsperados: ["TI-0002"] }, base), /Patrimônio/);
   const original = await readFile(destino);
   await sharp({ create: { width: 900, height: 900, channels: 3, background: "blue" } }).png().toFile(entrada);

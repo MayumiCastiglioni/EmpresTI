@@ -4,12 +4,16 @@ Estado: preparação parcial, não executar como entrega completa agora.
 [Spec](specs/dados-iniciais.md) · [Tarefas](tasks/dados-iniciais.md).
 Agente não executou upload, SQL remoto, deploy ou verificação de conta real.
 
+Atualizado em 11/11/2026: Pixabay está autorizado (DEC-30) e a chave local foi
+configurada. Seis PNGs foram aprovados visualmente pela usuária (DEC-31); seis patrimônios ainda não
+têm foto adequada e o manifesto é parcial. Não iniciar upload nem validação
+real da conta até o lote de 12 fotos e a revisão humana estarem concluídos.
+
 ## Antes de começar
 
-Resolver aquisição Pexels ou aprovar formalmente fonte alternativa; não apresentar
-imagens sintéticas dos testes como fotos da entrega. Preparar 12 PNGs reais,
-revisão visual documentada, metadados e manifesto conforme a skill. Sem chave,
-a etapa continua pendente. Não pôr credencial no chat ou em arquivo versionado.
+Usar Pixabay conforme DEC-30; não apresentar imagens sintéticas dos testes como
+fotos da entrega. Completar 12 PNGs reais, revisão visual documentada, metadados
+e manifesto conforme a skill. Não pôr credencial no chat ou em arquivo versionado.
 
 Confirmar projeto correto, organização EmpresTI/empresti e identidade autorizada
 do professor por canal privado. Conta usa cadastro/confirmação normal e papel
@@ -61,7 +65,7 @@ Após ferramenta/release apropriados e carga humana aprovada: conferir 12 patrim
 10 disponíveis/2 manutenção, metadados persistidos e reexecução sem duplicar.
 Confirmar cadastro/acesso do professor sem usar sua conta para solicitar itens;
 verificação de zero empréstimos pela pessoa responsável, preservando dados.
-Confirmar catálogo e crédito Fotos: Pexels com link para fotos dessa fonte;
+Confirmar catálogo e crédito do autor com link Pixabay para essas fotos;
 essa integração da interface ainda está pendente.
 
 ## Evidências a registrar sem segredos

@@ -1,5 +1,11 @@
 # Tarefas — solicitar empréstimo
 
+Rodada 11/11, partes 2–4: testes EMP-04/05/07/08 ampliados e refresh DEC-24
+corrigido; componente 7/7, suíte final 85/85, lint e TypeScript passaram.
+EMP-R2A confirmou correção estática; EMP-T08/aceite completo continuam pendentes:
+Postgres bloqueado antes dos 15 testes, builds sem aprovação e fotos reais não
+comprovadas. [Evidência](../verificacao/fechamento-2-4.md).
+
 [Spec](../specs/solicitar-emprestimo.md) · [Plano](../plans/solicitar-emprestimo.md).
 
 - [x] EMP-T00: rascunhar spec/plano/tasks e auditar divergências existentes.

@@ -11,7 +11,7 @@ test("DADOS-04/06 DAT-08A — leitura pública, hash, dimensões, falhas e sem a
     const tag=`TI-${String(i).padStart(4,"0")}`;
     const bytes=await sharp({create:{width:800,height:600,channels:3,background:{r:i*10,g:20,b:30}}}).png().toBuffer();
     const sha256=createHash("sha256").update(bytes).digest("hex");
-    photos[tag]={provider:"pexels",sourceId:String(i),sha256,bucket:"equipment-images",objectKey:`empresti/${tag}/${sha256}.png`,width:800,height:600};
+    photos[tag]={provider:"pixabay",sourceId:String(i),sha256,bucket:"equipment-images",objectKey:`empresti/${tag}/${sha256}.png`,width:800,height:600};
     files.set(`/storage/v1/object/public/equipment-images/${photos[tag].objectKey}`,bytes);
   }
   const different=await sharp({create:{width:800,height:600,channels:3,background:"black"}}).png().toBuffer();

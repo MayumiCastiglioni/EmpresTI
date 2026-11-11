@@ -45,7 +45,8 @@ test("DAT-06A DADOS-02/03/05/06 — Auth local, confirmação, vínculo repetido
     expect((await db.membership.findMany({where:{userId}}))[0].role).toBe("OPERACOES");
     await db.membership.update({where:{tenantId_userId:{tenantId,userId}},data:{role:"COLABORADOR"}});
     const equipment=await db.equipment.create({data:{tenantId,assetTag:"PROF-TEST",name:"Fixture",category:"monitor"}});
-    const loan=await db.loan.create({data:{tenantId,equipmentId:equipment.id,borrowerId:userId,dueAt:new Date(Date.now()+86400000)}});
+    // Simulate a preserved legacy active loan; new rows must be inserted as SOLICITADO.
+    const loan=await db.loan.create({data:{tenantId,equipmentId:equipment.id,borrowerId:userId,status:"SOLICITADO",dueAt:new Date(Date.now()+86400000)}});
     expect((await provisionLocalProfessor(input)).reason).toBe("existing-loans");
     expect(await db.loan.findUnique({where:{id:loan.id}})).toEqual(loan);
     await expect(provisionLocalProfessor({...input,supabaseUrl:"https://example.invalid"})).rejects.toThrow("somente");

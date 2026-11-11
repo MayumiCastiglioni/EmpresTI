@@ -34,7 +34,7 @@ test("DAT-05C DADOS-01/02/03/04/05/06 — arquivos, conta e lote em fluxo local 
       const bytes=await sharp({create:{width:800,height:600,channels:3,background:{r:++i*10,g:40,b:80}}}).png().toBuffer();
       const sha256=createHash("sha256").update(bytes).digest("hex");
       await writeFile(join(directory,`${tag}.png`),bytes);
-      photos[tag]={provider:"pexels",sourceId:String(i),sourceUrl:`https://www.pexels.com/photo/${i}/`,photographer:"Fixture sintética",photographerUrl:"https://www.pexels.com/@fixture/",licenseUrl:"https://www.pexels.com/license/",licenseCheckedAt:"2026-11-06",bucket:"equipment-images",objectKey:`empresti/${tag}/${sha256}.png`,width:800,height:600,sha256};
+      photos[tag]={provider:"pixabay",sourceId:String(i),sourceUrl:`https://pixabay.com/photos/fixture-${i}/`,photographer:"Fixture sintética",photographerUrl:`https://pixabay.com/users/fixture-${i}/`,licenseUrl:"https://pixabay.com/service/license-summary/",licenseCheckedAt:"2026-11-06",bucket:"equipment-images",objectKey:`empresti/${tag}/${sha256}.png`,width:800,height:600,sha256};
       reviews[tag]={state:"approved",reviewer:"Fixture de teste, não aprovação real",date:"2026-11-06"};
     }
     const input={connectionString:url.toString(),supabaseUrl:authUrl,serviceRoleKey:key,userId,expectedEmail:email,directory,photos,reviews};

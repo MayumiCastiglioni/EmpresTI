@@ -20,7 +20,27 @@ como integralmente concluídas por causa dos bloqueios e critérios abaixo.
   explicitamente o papel `verificador-spec`; isso não prova descoberta do TOML
   `.codex/agents/verificador-spec.toml` pelo carregamento nativo.
 
-Estado: PV-06 concluído; PV-05 e descoberta nativa pendentes; PRA-02 parcial.
+Estado em 06/11: PV-06 concluído; PV-05 e descoberta nativa pendentes; PRA-02 parcial.
+
+### Atualização de fechamento PRA-02 — 10/11/2026
+
+R4 descobriu e iniciou nativamente o agente configurado em .codex/config.toml,
+com as instruções de .codex/agents/verificador-spec.toml. O verificador leu a
+spec e a fixture, não editou arquivos e reportou PROVA-01 ATENDIDO após 1/1 teste.
+Resposta preservada em [rodada-r4](verificacao/prova-verificador/rodada-r4.md).
+
+O pai usou MXC read-only com rede desligada, leitura restrita ao repositório,
+perfil pessoal e quatro arquivos .env* negados, apps/plugins desativados, tabela
+MCP vazia, configuração pessoal ignorada e variáveis de segredo filtradas.
+Probes: escrita no projeto e acesso ao perfil/.env* → EPERM; TCP local → EACCES.
+Como o shell começou na raiz do sistema e não podia entrar no OneDrive, o check
+foi iniciado com WorkingDirectory do projeto e NODE_OPTIONS de preservação de
+links; os argumentos permaneceram --test e o caminho permitido da fixture.
+
+Estado atual: PV-01–PV-07 concluídos; PRA-02 concluída apenas para a prova técnica
+da fixture. Nenhuma spec do produto, segurança de produção ou critério EMP/DADOS
+foi aprovada por essa rodada. Nenhuma operação Git foi executada; commits antigos
+12aa161 e d8bdcbb continuam locais e sem push.
 
 ## PRA-03 — imagens
 
@@ -68,6 +88,33 @@ continuam com a pessoa responsável, sem escrita pelo agente.
 
 Estado: testes da implementação local passaram; DAT-01/04/05/06/07/08 e PRA-05
 permanecem abertos para aceite completo.
+
+## Snapshot anterior do tópico 4 — 11/11/2026, antes da configuração local
+
+O workspace foi conferido por tipos de arquivo: não contém fotos reais dos doze
+equipamentos nem manifesto do lote. As fotos de validação existentes são somente
+capturas da interface, não assets de produto. O Help Center oficial da Pexels
+continua informando que novas chaves estão pausadas. Depois dessa conferência,
+a usuária informou autorização formal do professor para Pixabay (DEC-30), mas
+`PIXABAY_API_KEY` está ausente. Nenhuma API, conta de professor, Storage ou banco
+remoto foi acessado.
+
+Naquele snapshot, nenhuma chamada real havia sido feita e a chave não estava
+configurada. O estado foi substituído pela atualização abaixo.
+
+## Aquisição Pixabay — atualização 11/11/2026
+
+A chave foi configurada localmente e foram feitas consultas e downloads
+individuais. Seis PNGs candidatos 800×600 foram preparados para
+TI-0003/0004/0005/0008/0009/0010. Vinte e um candidatos foram rejeitados com motivos
+registrados; TI-0001/0002/0006/0007/0011/0012 ainda precisam de fotos adequadas.
+O rascunho de manifesto fica em `.cache/pixabay/manifesto-candidatos.json`.
+`npm run test:images-local` passou 1/1; `node --test
+skills/imagens-equipamentos/scripts/preparar.test.mjs` passou 2/2; dimensões,
+IDs e hashes dos seis PNGs foram conferidos; a usuária aprovou esses seis
+visualmente (DEC-31). A revisão integral de 12 fotos, Storage,
+conta do professor e qualquer escrita de produção continuam pendentes. Ver
+[plano Pixabay](plans/adaptacao-pixabay.md) e [roteiro humano](roteiro-humano-dados-iniciais.md).
 
 ## Ações não executadas
 

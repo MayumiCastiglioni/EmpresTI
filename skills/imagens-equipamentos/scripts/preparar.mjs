@@ -23,8 +23,13 @@ export async function preparar(origem, destino) {
 }
 
 function texto(value) { return typeof value === "string" && value.trim().length > 0; }
-function urlPexels(value) {
-  try { const u = new URL(value); return u.protocol === "https:" && ["pexels.com", "www.pexels.com"].includes(u.hostname) && !u.search && !u.hash && !u.username && !u.password; }
+function urlPixabay(value, pathPrefix = "/") {
+  try {
+    const u = new URL(value);
+    return u.protocol === "https:" && u.hostname === "pixabay.com" && !u.port && !u.search &&
+      !u.hash && !u.username && !u.password && u.pathname.length > 1 && u.pathname.startsWith(pathPrefix) &&
+      (pathPrefix !== "/users/" || /^\/users\/[^/]+\/?$/.test(u.pathname));
+  }
   catch { return false; }
 }
 
@@ -37,15 +42,16 @@ export async function validar(manifesto, base) {
   for (const foto of fotos) {
     if (!patrimoniosEsperados.includes(foto.patrimonio) || patrimonios.has(foto.patrimonio)) throw new Error("Patrimônio ausente, extra ou duplicado");
     if (![foto.tipo, foto.consulta, foto.fotografo, foto.arquivo, foto.licencaConsultadaEm].every(texto) ||
-      ![foto.origem, foto.fotografoUrl, foto.licencaUrl].every(urlPexels)) throw new Error("Metadados ou créditos incompletos");
-    if (!Number.isSafeInteger(foto.pexelsId) || foto.pexelsId <= 0 || ids.has(foto.pexelsId)) throw new Error("ID Pexels inválido ou duplicado");
+      !urlPixabay(foto.origem, "/") || !urlPixabay(foto.fotografoUrl, "/users/") ||
+      foto.licencaUrl !== "https://pixabay.com/service/license-summary/") throw new Error("Metadados ou créditos Pixabay incompletos");
+    if (!Number.isSafeInteger(foto.pixabayId) || foto.pixabayId <= 0 || ids.has(foto.pixabayId)) throw new Error("ID Pixabay inválido ou duplicado");
     if (foto.revisao?.estado !== "aprovada" || !texto(foto.revisao.responsavel) || !texto(foto.revisao.data)) throw new Error("Revisão visual pendente");
     const bytes = await readFile(resolve(base, foto.arquivo));
     const m = await sharp(bytes).metadata();
     if (m.width !== 800 || m.height !== 600 || foto.largura !== 800 || foto.altura !== 600) throw new Error("Dimensões inválidas");
     const digest = hash(bytes);
     if (digest !== foto.sha256 || hashes.has(digest)) throw new Error("Hash incorreto ou conteúdo duplicado");
-    patrimonios.add(foto.patrimonio); ids.add(foto.pexelsId); hashes.add(digest);
+    patrimonios.add(foto.patrimonio); ids.add(foto.pixabayId); hashes.add(digest);
   }
   return { quantidade: fotos.length, estado: "validacao-local-aprovada" };
 }

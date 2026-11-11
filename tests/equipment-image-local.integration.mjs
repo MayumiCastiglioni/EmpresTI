@@ -21,7 +21,7 @@ test("DAT-03 — image opcional, constraint e leitura por tenant em Postgres loc
     await client.query(`INSERT INTO memberships(tenant_id,user_id) VALUES ($1,$2),($3,$4)`, [tenantA,userA,tenantB,userB]);
     await client.query(`INSERT INTO equipment(id,tenant_id,asset_tag,name,category,updated_at) VALUES ('55555555-5555-4555-8555-555555555555',$1,'IMAGE-TEST','Teste','monitor',now())`,[tenantA]);
     assert.equal((await client.query(`SELECT image FROM equipment WHERE asset_tag='IMAGE-TEST'`)).rows[0].image,null);
-    const image = { provider: "pexels", sourceId: "1", width: 800, height: 600 };
+    const image = { provider: "pixabay", sourceId: "1", width: 800, height: 600 };
     await client.query(`UPDATE equipment SET image=$1 WHERE asset_tag='IMAGE-TEST'`,[image]);
     for (const invalid of ['[]','"scalar"','1','null']) {
       await client.query("SAVEPOINT invalid_image");

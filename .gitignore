@@ -5,6 +5,9 @@
 
 # --- Vercel ---
 .vercel
+/.cache/pixabay/
+/.cache/external/
+/.cache/imagens/
 
 # --- Supabase CLI (credenciais e estado local) ---
 supabase/.temp

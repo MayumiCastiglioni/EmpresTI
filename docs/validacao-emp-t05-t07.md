@@ -82,6 +82,18 @@ a usuária revisou e aprovou as telas autenticadas, o foco e os tamanhos de view
 Essa aprovação cobre a apresentação e navegação revisadas; não cobre fotos reais,
 créditos, validação do papel no deployment ou aceite integral da spec.
 
+### Conferência de tipografia — 11/11/2026
+
+Revisei novamente as três capturas preservadas, desktop e viewport móvel de 390px.
+Títulos, nomes dos equipamentos, texto de confirmação e ações permanecem legíveis.
+Rótulos auxiliares, rodapé e patrimônios são menores e menos destacados, mas não
+impedem a leitura do fluxo; a captura móvel não mostra corte nem rolagem horizontal.
+Não recomendo aumento global de fonte nesta rodada, pois isso também ampliaria os
+identificadores longos e a altura dos cartões. Nenhuma mudança visual foi feita.
+Esta é uma avaliação técnica das capturas; a aprovação humana registrada em 10/11
+continua sendo a aprovação das telas autenticadas, foco e viewports. Fotos reais
+e seus créditos seguem fora dela.
+
 ## Limites e pendências
 
 Os testes de procedures usam `createCaller` e verificam sessão/tenant com fixture;
@@ -90,7 +102,7 @@ e cookies do Auth foram testados no ambiente local; não houve validação do pa
 configurado no deployment.
 Testing Library verifica componentes; o fluxo Playwright e a conferência humana
 de telas, foco e viewports foram concluídos e aprovados conforme a seção EMP-T07.
-Não há fotos Pexels reais no banco/bucket, então somente o fallback visual foi
+Não há fotos reais no banco/bucket, então somente o fallback visual foi
 revisado; aquisição e revisão das fotos permanecem pendentes.
 
 EMP-T05 está concluída localmente. EMP-T06/07 são parciais; critérios de aceite

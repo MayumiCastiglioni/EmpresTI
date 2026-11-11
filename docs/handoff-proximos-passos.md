@@ -1,23 +1,24 @@
-# Handoff — 10/11/2026
+# Handoff - 11/11/2026
 
-Próximo roteiro: [plano de fechamento](plans/fechamento-entrega.md).
+Envio imediato solicitado; resumo final disponível no início de ENTREGA.md (DEC-ENVIO-IMEDIATO).
+DEC-35: 12 fotos aprovadas visualmente pela usuária em .cache/imagens/manifesto-candidatos.json; ressalvas preservadas.
+Prazo não dispensa gates: produção/tag não executadas nem aprovadas.
 
-## Estado
-
-EMP-T03/04/05 concluídas; EMP-T06/07 parciais. HTTP/Auth/cookies e Playwright local passaram; quatro migrations passaram em Postgres descartável. Evidências: `docs/validacao-emp-t03-auth.md`, `docs/validacao-emp-t05-t07.md`.
-Commit `bc259e6` está em `codex/alinhamento-aulas`; Vercel Preview passou. O log de `main` (05/11) apontou `NEXT_NO_ROUTES_MANIFEST`: aquela versão usava `distDir: build`, mas a Vercel procurava `.next`. O commit atual usa o diretório padrão; `main`/produção não foram atualizadas.
-
-## Checks
-
-`npm test` 81/81; loans Postgres 8/8; HTTP e Playwright 1/1 cada; lint, TypeScript e build passaram após Next.js 16.4.6/Prisma 7.10.1.
-Auditoria npm de produção: zero vulnerabilidades; sete moderadas restantes em ferramentas de dev.
-
-## Pendências
-
-EMP-T07: telas/foco/viewports aprovados em 10/11; faltam fotos reais e créditos. EMP-T08/PRA-02: revisão independente, isolamento e carregamento nativo.
-PRA-03/04/05: fotos, Storage e conta do professor; produção exige execução humana. Operações: acesso futuro pendente.
-Produção: migration remota precisa de revisão e execução pela pessoa responsável; nenhuma escrita remota foi feita pelo agente.
-
-## Próxima ação
-
-Seguir o plano de fechamento a partir do verificador independente e concluir fotos reais; manter a produção bloqueada até revisão humana das migrations e dados.
+Partes 2–4: [evidência atual](verificacao/fechamento-2-4.md), DEC-FECH-234 no registro central.
+Fotos seguem em outra conversa; não sobrescrever manifesto ou decisões desse trabalho.
+EMP-R2 e DADOS-R3 independentes: NÃO PRONTA; ambiente permite escrita, isolamento não comprovado.
+EMP-R2A confirmou estaticamente correção do refresh na indisponibilidade (DEC-24).
+Principal ampliou testes EMP-04/05/07/08 e HTTP de campos forjados; sem mudança de schema.
+Componente final 7/7; suíte final 85/85; TypeScript e lint finais passaram.
+Integração loans atual: beforeAll falhou connect EACCES 127.0.0.1:54322; 15 testes não executados.
+Não repetir contra remoto nem remover guardas. 9/9 loans e 3/3 dados anteriores são históricos.
+Suítes intermediárias falharam; timeout LOGIN-04 não repetiu no isolado 2/2 nem na suíte final.
+Build isolado: npm ci ENOTFOUND registry.npmjs.org; padrão: EPERM em .next/build/chunks; nenhum aprovado.
+Dados reais não consultados/escritos; conta professor não acessada; zero empréstimos não comprovado.
+Roteiro humano existente exige fotos completas e ferramenta operacional de produção aprovada, ainda ausente.
+Quatro migrations revisadas estaticamente; nenhuma aplicada remotamente nesta sessão.
+Main, produção e tag não alteradas; nenhum comando Git executado, alterações não commitadas.
+ENTREGA e checklist mantêm bloqueios; auditoria integral final do enunciado não realizada.
+Aprovação visual anterior das telas não cobre fotos; ver evidências históricas EMP-T05/T07.
+Próxima ação: permitir conexão de testes locais no ambiente e reexecutar loans, HTTP/browser e dados.
+Depois: concluir fotos/Storage/carga humana, login normal professor/zero empréstimos, revisão e publicação.

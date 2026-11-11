@@ -1,13 +1,72 @@
 # Entrega da prática
 
+## Fotos — aceite atual de 11/11/2026
+
+**As 12 fotos estão visualmente aprovadas pela usuária**, conforme instrução
+explícita registrada em DEC-35 no [registro de decisões](docs/produto/decisoes-pratica.md).
+Manifesto integral localizado: `.cache/imagens/manifesto-candidatos.json`;
+revisão atualizada por foto, preservando histórico e ressalvas técnicas.
+Substitui os resumos anteriores de oito aprovações e arquivo final não localizado.
+O snapshot em `.cache/pixabay/` é parcial e histórico. Fontes mistas e ressalvas
+de adequação permanecem registradas: aceite visual não comprova autorização do
+professor para as fontes, validação técnica, Storage ou DADOS-04 integral.
+
+## Versão para envio imediato — 11/11/2026
+
+Resumo atual para avaliação: aplicação local implementada; **85/85 testes
+padrão, 7/7 testes da interface, lint e TypeScript passaram** nesta sessão.
+Foram corrigidas as consultas após indisponibilidade e ampliadas as provas
+de prazo, atraso, proteção de dados e estados de interface.
+
+A usuária informou que o manifesto foi concluído na conversa responsável pelas
+fotos. Na conferência deste workspace, `.cache/pixabay/manifesto-candidatos.json`
+ainda declara oito fotos aprovadas e quatro faltantes. O arquivo final não foi
+identificado/validado nesta sessão; esse snapshot anterior não invalida o relato,
+mas não serve como prova do lote final. Confirmar o artefato final da outra conversa.
+
+Limitações que acompanham o envio: integrações Postgres bloqueadas por EACCES;
+build padrão bloqueado por EPERM no OneDrive e build isolado por DNS do npm.
+Migrations remotas, Storage/inventário reais, login normal do professor e zero
+empréstimos não comprovados. Main, produção e tag final não atualizadas.
+As revisões independentes permanecem NÃO PRONTA; não há aceite integral das
+specs nem confirmação de produção funcional. Não enviar arquivos de ambiente,
+credenciais ou a pasta de cache como substitutos dos artefatos finais revisados.
+
+Este documento registra a versão disponível para envio, com pendências
+explícitas; o prazo de envio não converte requisitos pendentes em cumpridos.
+
+## Fechamento das partes 2, 3 e 4 — 11/11/2026
+
+Entrega continua pendente. [DEC-FECH-234](docs/produto/decisoes-pratica.md)
+registra a solicitação atual; fotos são tratadas em outra conversa.
+Foram ampliadas provas de prazo/atraso, recusa sem escrita, inputs forjados e
+estados da interface. Corrigida a atualização de consultas na recusa por
+indisponibilidade prevista na DEC-24, com testes de atualização e erro.
+[EMP-R2](docs/verificacao/emprestimos-r2.md) e
+[DADOS-R3](docs/verificacao/dados-iniciais/r3.md) deram **NÃO PRONTA**;
+isolamento técnico não comprovado. Integração Postgres não executou os 15
+testes: connect EACCES 127.0.0.1:54322. Não confundir com os 9/9 históricos.
+Lint e TypeScript passaram antes da correção de runtime; reteste de componente
+intermediário passou 5/5. Checks finais constam no
+[relatório de fechamento](docs/verificacao/fechamento-2-4.md).
+Após correção DEC-24: componente final 7/7, lint e TypeScript passaram;
+EMP-R2A confirmou resolução estática do achado. Suíte completa intermediária
+82/83 (timeout logout); logout isolado 2/2. **Suíte final passou 85/85**.
+Build isolado falhou na instalação por ENOTFOUND; build padrão falhou por
+EPERM em `.next/build/chunks` no OneDrive. Nenhum build aprovado nesta rodada.
+Migrations revisadas estaticamente, sem aplicação remota. Inventário/Storage,
+login real e zero empréstimos do professor continuam não comprovados. Main,
+produção e tag não alteradas: faltam gates funcionais e evidências reais.
+Não houve mudança de schema nem operação Git; alterações não commitadas.
+
 **Status: rascunho em andamento — não é declaração de entrega concluída.**
-Atualizado em 10/11/2026. Plano: [prática](docs/plans/pratica-sdd-subagentes.md).
+Atualizado em 11/11/2026. Plano: [prática](docs/plans/pratica-sdd-subagentes.md).
 Respostas: [registro de decisões](docs/produto/decisoes-pratica.md).
 
 ## Links
 
 - Repositório: https://github.com/MayumiCastiglioni/EmpresTI
-- Produção: pendente confirmar funcionamento e corrigir a falha do Preview Vercel no [PR #1](https://github.com/MayumiCastiglioni/EmpresTI/pull/1); o log de build não foi acessível nesta sessão e a causa continua sem confirmação.
+- Produção: o Preview da branch `codex/alinhamento-aulas` passou; `main` e produção ainda não foram atualizadas. A causa da falha de `main` foi identificada como `NEXT_NO_ROUTES_MANIFEST` após uso de `distDir: build`; migrations e dados remotos continuam pendentes.
 - Tag entrega-pratica: ainda não criada.
 
 ## 1. Conflitos: o que foi pedido contra o que já existia
@@ -18,8 +77,8 @@ Respostas: [registro de decisões](docs/produto/decisoes-pratica.md).
 | 14 dias úteis | Prazo de 14 dias sem contagem definida | Usuária escolheu úteis; calendário 2026–2030/23:59:59 integrado ao serviço e validado localmente | Escolha explícita da usuária | PRD; spec MVP; PRAT-C02; EMP-T02/05 | Não commitado |
 | TI-0010 disponível no briefing | Lista de equipamentos o coloca em manutenção | Usuária escolheu disponível; nenhuma carga executada | Escolha explícita: conforme briefing | PRD; spec MVP; PRAT-C03 | Não commitado |
 | Senha literal no arquivo de carga | Regras de segredos | Não foi criada carga nem versionada senha; forma privada ainda a especificar | Proibição vigente preservada | PRAT-C04; docs/rules/secrets.md | Pendente |
-| Verificador corrigir teste | Independência e proibições do verificador | Rodadas versionadas R1/R2 não corrigiram a fixture; isolamento técnico segue não comprovado | Contrato vigente preservado | PRAT-C05; docs/verificacao/prova-verificador/resultado.md | 12aa161, d8bdcbb (somente fixture; locais) |
-| Catálogo sem crédito | Contrato de crédito Fotos: Pexels | Crédito Pexels é exibido quando metadados válidos existem; nenhuma foto real disponível para validar | Escolha explícita da usuária | PRAT-C06; EMP-T07 | Pendente |
+| Verificador corrigir teste | Independência e proibições do verificador | R1/R2 não corrigiram a fixture; R4 comprovou descoberta nativa e isolamento MXC local, com check 1/1 | Contrato vigente preservado; PRA-02 concluída somente para a fixture | PRAT-C05; DEC-28; docs/verificacao/prova-verificador/resultado.md | 12aa161, d8bdcbb (somente fixture; locais) |
+| Catálogo sem crédito | Fonte original Pexels indisponível | Oito fotos Pixabay aprovadas; quatro candidatos externos registrados, com ressalvas e sem aceite visual | Usuária autorizou fontes externas em 11/11; autorização do professor para elas não informada | DEC-30/31/32/34; `.cache/imagens/manifesto-candidatos.json`; PRAT-C06 | Parcial |
 | Instalar sharp | Dependências limitadas pelos ADRs/regras | Autorizado pela usuária; sharp 0.35.5 instalado para processamento local | Autorização explícita recebida; atualização de ADR pelo time | PRAT-C07 | Pendente |
 
 As specs de dados iniciais e de solicitação existem. O pipeline local usa
@@ -46,23 +105,34 @@ produto e foram registradas no PRD; nenhum ADR foi escrito pelo agente.
 
 ## 4. A skill imagens-equipamentos
 
-[Procedimento criado](skills/imagens-equipamentos/SKILL.md), com preparação e
-validação local testadas. O Help Center oficial da Pexels, verificado em 07/11/2026,
-que a emissão de novas chaves está pausada; [fonte](https://help.pexels.com/hc/en-us/articles/900004904026-How-do-I-get-an-API-key).
-Não existem fotos reais aprovadas. Pixabay não foi aprovado como troca. Revisão
-visual, créditos dos arquivos e upload humano continuam pendentes.
+[Procedimento criado](skills/imagens-equipamentos/SKILL.md), com ferramenta de
+busca/download unitário e validadores Pixabay testados localmente. A chave foi
+configurada localmente; oito PNGs (TI-0001/0002/0003/0004/0005/0008/0009/0010)
+foram aprovados visualmente (DEC-31/32). TI-0006/0007/0011/0012 seguem sem
+candidato adequado nas buscas documentadas; DEC-34 substituiu DEC-33 e autorizou
+fontes externas. O manifesto local tem 12 candidatos, 12 hashes únicos e arquivos
+800×600; oito têm aceite visual e quatro permanecem pendentes. TI-0006 tem
+adesivo/etiquetas e TI-0012 retrata câmera de corpo grande, exigindo substituição
+ou revisão antes de DADOS-04. Origem e crédito constam no manifesto ignorado pelo
+Git. Manifesto final aceito, Storage e validação da conta continuam pendentes. A API exige cache de
+24h e download local sem hotlink permanente. [API](https://pixabay.com/api/docs/) ·
+[licença](https://pixabay.com/service/license-summary/). Evidências no
+[plano de adaptação](docs/plans/adaptacao-pixabay.md).
 
 ## 5. O subagente verificador
 
 O [contrato](agents/verificador-spec.md), o gatilho no
 [specflow](docs/rules/specflow.md) e a configuração nativa em
-.codex/agents/verificador-spec.toml foram preparados. O TOML foi validado,
-mas seu carregamento nativo ainda não foi comprovado. As rodadas usaram
-subagentes novos com delegação explícita e contexto limpo.
+.codex/agents/verificador-spec.toml foram preparados; `.codex/config.toml`
+registra o papel do projeto. Na R4, o Codex descobriu e iniciou o agente
+nativamente. O check passou 1/1 em uma sessão MXC read-only; escrita no projeto,
+perfil e `.env*` foi negada, assim como conexão TCP. Apps/plugins e MCPs estavam
+desativados, e o ambiente pessoal foi ignorado/filtrado.
 
-O isolamento técnico permanece **não comprovado**: as sessões permitem escrita
-e ferramentas externas. O acionamento explícito do papel verificador não prova
-que o TOML do projeto foi descoberto/carregado nativamente.
+PRA-02 está concluída apenas para a fixture técnica. A configuração está local,
+ainda sem commit; não houve push, deploy ou acesso a serviço remoto. Isso não
+aprova as specs do produto nem certifica isolamento em produção. Ver
+[DEC-28](docs/produto/decisoes-pratica.md) e [evidência R4](docs/verificacao/prova-verificador/resultado.md).
 
 ## 6. O verificador em ação
 
@@ -72,17 +142,19 @@ Prova controlada real: [resultado e integridade](docs/verificacao/prova-verifica
 |---|---|---|---|
 | R1 | Erro plantado pelo principal | REPROVADO; asserção falhou | Nenhuma |
 | R2 | Restaurada pelo principal | ATENDIDO; teste passou | Nenhuma |
+| R4 | Restaurada; agente nativo sob MXC read-only | ATENDIDO; 1 teste passou | Nenhuma |
 
 As respostas completas estão preservadas no resultado. A prova versionada
 criou `12aa161` (erro) e `d8bdcbb` (restauração), somente para a fixture; ambos
-estão locais, sem push. O teste terminou restaurado. PV-05 permanece pendente,
-e a prova não aprova as specs de produto.
+estão locais, sem push. O teste terminou restaurado. A R4 concluiu PV-05 e PV-07
+para esta fixture. A prova não aprova as specs de produto.
 
 ## 7. Uma regra sua que esta prática pôs à prova
 
 A proibição de autocorreção foi exercitada: R1 reportou a falha e deixou o
-erro intacto, conferido pelo principal antes da restauração. Isso demonstra
-comportamento nesta prova, sem comprovar bloqueio técnico de escrita.
+erro intacto, conferido pelo principal antes da restauração. A R4 também
+comprovou bloqueio técnico local de escrita e rede durante a prova; isso não
+certifica outros ambientes nem produção.
 A proibição de senha em código continua preservada; não foi criada carga.
 
 ## 8. O que ficou de fora e o que faria diferente
@@ -131,7 +203,7 @@ reexecução, senha preservada e divergências/empréstimos intactos. Não compr
 cadastro/entrega de e-mail do professor em produção ou carga completa.
 
 DAT-05C integrou arquivos, revisão registrada, conta e lote em operação local.
-Integrações sintéticas 3/3 passaram; não comprova fotos Pexels, Storage público
+Integrações sintéticas 3/3 passaram; não comprova fotos reais, Storage público
 ou acesso do professor no deploy. Evidências em docs/validacao-dat05c-fluxo-local.md.
 
 DAT-07A: interrupção após oito INSERTs no Postgres local comprovou rollback de
@@ -143,6 +215,12 @@ Fonte: docs/validacao-dat07a-rollback.md e docs/verificacao/dados-iniciais/r1.md
 completa. Revisor reproduziu 59 testes/lint, mas não integrações com escrita;
 fotos reais, Storage, acesso professor e roteiro humano continuam pendentes.
 Não há CA completo aprovado por esta rodada.
+
+Em 11/11, as revisões [EMP-R1](docs/verificacao/emprestimos-r1.md) e
+[DADOS-R2](docs/verificacao/dados-iniciais/r2.md) também devolveram **NÃO PRONTA**.
+Ambas registraram isolamento técnico não comprovado nesta sessão. O principal
+corrigiu parte dos testes EMP depois do parecer; integração local passou 9/9
+e lint passou, sem novo aceite independente. Seis fotos continuam faltando.
 
 DAT-08A: verificador público de imagens e roteiro humano parcial preparados,
 validados contra servidor HTTP de teste. Nenhuma consulta/publicação real no
@@ -191,13 +269,18 @@ consulta remota. [DEC-21](docs/produto/decisoes-pratica.md) e
 [evidências EMP-T03](docs/validacao-emp-t03-auth.md).
 ## PRA-02 a PRA-05 — estado desta execução
 
-PRA-02: commits locais `12aa161` (erro) e `d8bdcbb` (restauração); R1 falhou
-e R2 passou na fixture. Ambos os revisores marcaram isolamento técnico como
-NÃO COMPROVADO; configuração nativa ainda não provada.
+PRA-02: R1 detectou o erro plantado; R2 e R4 aprovaram a fixture restaurada,
+sem autocorreção. R4 carregou o agente nativamente e passou 1/1 em sessão MXC
+read-only, com escrita, perfil, `.env*` e rede bloqueados. Os commits locais
+`12aa161` e `d8bdcbb` registram o erro/restauração. A PRA-02 está concluída
+somente para a fixture; configuração local ainda não commitada, sem push ou
+deploy. Detalhes em [resultado](docs/verificacao/prova-verificador/resultado.md)
+e [DEC-28](docs/produto/decisoes-pratica.md).
 
-PRA-03: testes locais de preparação 2/2 e verificação HTTP simulada 1/1. A
-aquisição API Pexels está bloqueada por pausa oficial de novas chaves; nenhuma
-foto real ou upload foi produzido. A origem alternativa continua sem aprovação.
+PRA-03: testes da skill 7/7, pré-validação 9/9, `test:images-local` 1/1 e
+`preparar.test.mjs` 2/2 passaram. Seis imagens reais têm dimensão/hash
+conferidos e aprovação visual da usuária (DEC-31); seis patrimônios seguem sem foto
+adequada. Nenhum upload ou acesso ao Storage remoto foi feito.
 
 PRA-04: DDL de imagem aprovado e migration local concluída. DADOS-R1 retornou
 NÃO PRONTA; a spec de dados permanece aberta por falta de fotos/Storage/conta real.
@@ -205,6 +288,18 @@ NÃO PRONTA; a spec de dados permanece aberta por falta de fotos/Storage/conta r
 PRA-05: `npm run test:images-local` 1/1 e `npm run test:initial-data-local` 3/3
 passaram com Postgres/Auth locais e fixtures sintéticas. Sem CLI/rota operacional,
 fotos reais, Storage, conta do professor ou escrita de produção.
+
+Tópico 4 do planejamento: a origem e a implementação Pixabay estão autorizadas;
+chave local configurada, aquisição parcial. Faltam seis fotos adequadas e revisão
+humana. Storage e validação da conta continuam sendo ações da pessoa responsável
+em produção. A conta do professor não foi usada em testes; o
+roteiro exige validar o fluxo normal e zero empréstimos sem compartilhar senha.
+O teste com fixtures não é evidência de dados reais. A adaptação local está
+implementada e `npm run test:initial-data-local` passou 3/3 após a fixture do
+empréstimo legado declarar o estado `SOLICITADO`. Nenhuma chamada à API, leitura
+de `.env.local` ou alteração remota foi realizada.
+Detalhes e próximos passos: [plano de dados iniciais](docs/plans/dados-iniciais.md)
+e [roteiro humano](docs/roteiro-humano-dados-iniciais.md).
 
 Evidência consolidada: [PRA-02 a PRA-05](docs/validacao-pra02-pra05.md).
 
@@ -216,6 +311,21 @@ fosse desativada; ela não está ativa. O prompt padrão permanece em
 [docs/prompt-pipeline-automatica.md](docs/prompt-pipeline-automatica.md) como
 referência para retomada manual. DEC-22 registra a ativação inicial e a
 desativação posterior.
+
+## Build local e revisão visual — 11/11/2026
+
+O build local a partir do OneDrive agora pode ser executado com
+`npm run build:isolated`: a cópia fora da pasta sincronizada passou em Prisma,
+TypeScript e Next.js; arquivos `.env*` não são copiados e a cópia temporária é
+removida. CI/Vercel continuam usando `npm run build` com `.next` padrão. Ver
+[DEC-29](docs/produto/decisoes-pratica.md) e [evidência COR-02](docs/validacao-cor02-build.md).
+
+As capturas de catálogo desktop, confirmação e catálogo móvel foram conferidas
+em 11/11. A aprovação humana de 10/11 cobre as telas autenticadas, o foco e os
+viewports. A leitura dos títulos, ações e textos da confirmação está boa; os
+metadados são menores, mas legíveis. Não foi recomendada mudança global de fonte
+nem houve alteração visual. Fotos reais e créditos continuam pendentes, fora do
+aceite das capturas. [Revisão visual](docs/validacao-emp-t05-t07.md).
 
 ## Aprovação de legado e reenvio — 08/11/2026
 
@@ -288,7 +398,7 @@ das dependências e restauração do `distDir` padrão do Next.js. Evidências e
 
 Limites atuais: RLS de leitura e rotas HTTP/Auth/cookies/browser passaram no
 Postgres/Supabase locais; papel do deployment não comprovado. Em 10/11, a usuária
-aprovou as telas autenticadas, o foco e os tamanhos de viewport. Fotos Pexels reais
+aprovou as telas autenticadas, o foco e os tamanhos de viewport. Fotos reais
 e seus créditos ainda faltam; essa aprovação não cobre as imagens. Falta revisão
 independente dos EMPs e validação da versão final. Build Next passou localmente.
 

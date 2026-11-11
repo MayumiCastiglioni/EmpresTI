@@ -43,6 +43,17 @@ function loanStatus(loan: Loan) {
   }
 }
 
+function imageSourceLabel(sourceUrl: string) {
+  try {
+    const hostname = new URL(sourceUrl).hostname;
+    if (["pixabay.com", "www.pixabay.com"].includes(hostname)) return "Pixabay";
+    if (["pexels.com", "www.pexels.com"].includes(hostname)) return "Pexels";
+  } catch {
+    // The image link is validated in the initial-data pipeline; malformed legacy data gets a neutral label.
+  }
+  return "Origem";
+}
+
 function friendlyError(error: unknown) {
   if (error instanceof Error && [
     "Este equipamento não está mais disponível. Atualize o catálogo.",
@@ -167,6 +178,13 @@ export default function CatalogoPage() {
       }
     } catch (error) {
       setActionError(friendlyError(error));
+      if (error instanceof Error && error.message === "Este equipamento não está mais disponível. Atualize o catálogo.") {
+        try {
+          await refresh();
+        } catch {
+          setLoadingError("Não foi possível atualizar as listas; tente atualizar os dados novamente.");
+        }
+      }
     } finally {
       setPendingId("");
     }
@@ -233,7 +251,7 @@ export default function CatalogoPage() {
                     <div className="equipment-category">{item.category}</div>
                     <h3>{item.name}</h3>
                     <p className="equipment-tag">Patrimônio <strong>{item.assetTag}</strong></p>
-                    {item.image && <p className="equipment-credit">Foto: <a href={item.image.photographerUrl} target="_blank" rel="noreferrer">{item.image.photographer}</a> · <a href={item.image.sourceUrl} target="_blank" rel="noreferrer">Pexels</a></p>}
+                    {item.image && <p className="equipment-credit">Foto: <a href={item.image.photographerUrl} target="_blank" rel="noreferrer">{item.image.photographer}</a> · <a href={item.image.sourceUrl} target="_blank" rel="noreferrer">{imageSourceLabel(item.image.sourceUrl)}</a></p>}
                     {item.status === "DISPONIVEL" ? (
                       <button className="borrower-request-button" type="button" onClick={(event) => openRequest(item, event)} aria-label={`Solicitar empréstimo de ${item.name}, patrimônio ${item.assetTag}`}>
                         Solicitar empréstimo

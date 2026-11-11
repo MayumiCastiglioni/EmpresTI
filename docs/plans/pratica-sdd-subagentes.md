@@ -20,8 +20,8 @@ Não declara aprovadas as duas specs, dependências, DDL ou ações de produçã
 | Etapa | Entrega | Aceite e dependências |
 |---|---|---|
 | PRA-01 | Registrar conflitos, lacunas e decisões do usuário | Tabela de conflitos abaixo respondida; regras confirmadas nas fontes corretas antes da implementação afetada |
-| PRA-02 | Adaptar e provar o verificador existente | Acionamento obrigatório, contexto limpo, saída comparável, sem autocorreção nem capacidade de escrita em produção; erro plantado e restauração com evidências |
-| PRA-03 | Criar skill imagens-equipamentos | Contrato Pexels atendido e auditado; geração/preparação local separada do upload humano; scripts verificam tamanho, duplicidade e manifesto; revisão visual documentada |
+| PRA-02 | **Concluída em 10/11 para a fixture técnica (DEC-28).** | R1/R2/R4 provaram erro/restauração, independência, descoberta nativa e bloqueios MXC; nenhuma spec de produto ou produção foi aprovada |
+| PRA-03 | Criar skill imagens-equipamentos | API Pixabay autorizada (DEC-30); aquisição/preparação local, cache de 24h, manifesto e revisão visual; upload humano separado |
 | PRA-04 | Aprovar spec, plano e tarefas de dados iniciais | 12 equipamentos exatos, situações decididas, imagem/crédito, idempotência, conta do professor e zero empréstimos especificados; tenant e identidade definidos |
 | PRA-05 | Implementar dados e imagens localmente | DDL/impacto aprovados antes de schema; migrations novas, scripts e testes locais; rodar carga duas vezes sem duplicar; professor não usado como conta de teste; verificador aprova spec |
 | PRA-06 | Aprovar spec, plano e tarefas de solicitar empréstimo | Limite e prazo decididos; catálogo, próprios empréstimos, estados e conflitos simultâneos com critérios identificados |
@@ -45,8 +45,8 @@ modificar configurações remotas nem atribuir causa sem evidência.
 | PRAT-C02 | Briefing pede 14 dias úteis; PRD dizia 14 dias sem fechar contagem | Regra resolvida: 14 úteis, feriados nacionais fixos, 2026–2030, 23:59:59 São Paulo; cálculo consumido pelo serviço e validado localmente |
 | PRAT-C03 | Lista põe TI-0010 em manutenção; briefing de dados deixa somente TI-0004/TI-0007 em manutenção | Resolvido: TI-0010 disponível; TI-0004/TI-0007 em manutenção, 10 disponíveis; lote ainda não carregado com dados reais |
 | PRAT-C04 | Briefing pede senha literal no arquivo de carga; regras proíbem segredo em código/Git | Não versionar senha; propor entrada por variável privada/entrada humana, sem registrar valor no ENTREGA.md |
-| PRAT-C05 | Tech lead pede que verificador corrija teste; contrato exige independência | R1/R2 da fixture não corrigiram; isolamento técnico e carregamento nativo ainda não comprovados |
-| PRAT-C06 | Briefing pede catálogo sem crédito; contrato da skill exige Fotos: Pexels com link | Usuária aceita manter crédito; UI o exibe quando os metadados são válidos; fotos reais pendentes |
+| PRAT-C05 | Tech lead pede que verificador corrija teste; contrato exige independência | R1/R2 não corrigiram a fixture; R4 comprovou descoberta nativa e isolamento local MXC. Prova cobre somente a fixture, sem aprovar specs de produto ou produção; ver DEC-28 e resultado PRA-02 |
+| PRAT-C06 | Briefing pede catálogo sem crédito; fonte original Pexels indisponível | Pixabay autorizado pelo professor (DEC-30); UI/validadores adaptados para manter autor e origem; fotos reais pendentes |
 | PRAT-C07 | Briefing manda instalar sharp; ADR não o lista | Sharp autorizado e instalado para processamento local; atualização de ADR continua com o time |
 
 O enunciado confirma a decisão já registrada: solicitação inicia o empréstimo,
@@ -61,16 +61,18 @@ do PRD. Reconciliar as migrations atuais, que ainda reservam antes da retirada.
   de acesso continuam pendentes; testes locais usam conta sintética.
 - Unicidade tenant + patrimônio, modelo de imagem e regra de reexecução aprovados;
   coluna image já existe na migration local. Fotos reais e objetos ainda faltam.
-- Pexels exige API; emissão de novas chaves foi informada como pausada em
-  06/11/2026. Pixabay não foi aprovado como substituição pelo professor.
+- Pixabay autorizado pelo professor em 11/11 (DEC-30); chave local configurada.
+  Seis candidatos foram preparados e seis patrimônios ainda precisam de foto
+  adequada; manifesto final e revisão humana pendentes. Pexels continua sem novas chaves.
 - Delimitar permissões mínimas para visualizar dados próprios, solicitar e
   consultar catálogo; concessão de Operações continua fora desta fatia.
 
 ## Contrato mínimo da skill — PRA-03
 
-Somente API Pexels com credencial privada; nenhuma imagem gerada por IA ou
-busca em outra origem. Uma foto distinta por equipamento; manifesto registra
-ID, autor, URL de origem, licença e caminho de destino. Garantir dimensões
+Somente API Pixabay com credencial privada; nenhuma imagem gerada por IA ou
+busca em outra origem. Cacheie respostas de busca por 24 horas; não faça
+downloads em massa nem hotlink permanente. Uma foto distinta por equipamento;
+manifesto registra ID, autor, URL de origem, licença e caminho de destino. Garantir dimensões
 reais 800 x 600 por código, não só parâmetro ou pedido em linguagem natural.
 Revisar pessoas, marcas/logos legíveis, textos e telas com conteúdo; registrar
 quantidade e motivos de rejeição. Não tratar revisão visual como garantia de
@@ -86,9 +88,11 @@ oficial da API e a aprovação das ferramentas antes da execução.
 Login/cadastro/logout, proteção de páginas, Prisma local, health e diagnóstico
 implementados. EMP-T03/04/05 estão concluídas localmente; EMP-T06/07 parciais,
 com testes HTTP e Playwright autenticado local aprovados; usuária aprovou telas,
-foco e viewport em 10/11. PRA-02 tem duas rodadas versionadas, mas isolamento nativo não foi
-provado. A preparação e carga sintéticas existem; fotos reais, Storage e acesso
-do professor faltam. A conta sintética não prova acesso de produção.
+foco e viewport em 10/11. PRA-02 foi concluída para a fixture na R4: agente
+nativo descoberto, check 1/1 aprovado e isolamento local MXC comprovado. Isso
+não aprova specs de produto nem comprova segurança em produção. A preparação e
+carga sintéticas existem; fotos reais, Storage e acesso do professor faltam. A
+conta sintética não prova acesso de produção.
 
 ## O que fica em suporte ou para depois
 
@@ -341,3 +345,35 @@ Vercel falhou e seus detalhes não puderam ser lidos. A auditoria confirma que
 fotos/Storage/conta do professor e os fluxos EMP em produção seguem pendentes.
 Pexels confirmou em 07/11 que novas chaves continuam pausadas; Pixabay não foi
 aprovado. Não houve acesso a Vercel/Supabase remoto nem Git neste trabalho.
+
+## Fechamento PRA-02 — 10/11/2026
+
+A prova da fixture foi concluída na R4. O Codex descobriu e iniciou o papel
+nativo registrado em `.codex/config.toml`; o check passou (1/1) em sessão MXC
+read-only, com escrita no repositório/perfil/arquivos `.env*` e conexão TCP
+bloqueadas. Registro operacional DEC-28 e evidência integral em
+[resultado PRA-02](../verificacao/prova-verificador/resultado.md) e
+[resposta R4](../verificacao/prova-verificador/rodada-r4.md). A configuração
+é local e ainda não foi commitada; nenhum commit, push, deploy, acesso a serviço
+remoto ou alteração da fixture ocorreu nessa rodada. PRA-02 permanece limitada
+à fixture técnica, sem aceite de produto ou produção. As seções de 06/11 acima
+registram o estado histórico e foram superadas por esta atualização.
+
+## Atualização do tópico 4 — 11/11/2026
+
+Pixabay foi autorizado pelo professor segundo confirmação da usuária (DEC-30).
+O plano local foi aprovado e sua Tarefa 1 implementada: adaptador de busca e
+download de um ID por vez, cache de 24 horas, validadores e crédito do catálogo.
+Testes da skill 7/7, pré-validação 9/9, teste de imagem Postgres 1/1, lint e
+build isolado passaram. A suíte de dados iniciais passou 3/3 após corrigir a
+fixture legada. Aquisição parcial e pendências estão atualizadas abaixo.
+
+### Atualização de aquisição Pixabay — 11/11/2026
+
+A chave local foi configurada. Seis PNGs candidatos foram preparados para
+TI-0003/0004/0005/0008/0009/0010; seis patrimônios ainda não têm foto adequada.
+Vinte e um candidatos foram rejeitados com motivos registrados. Revisão visual
+humana, manifesto final, Storage e validação da conta do professor permanecem
+pendentes. O estado detalhado está em
+[adaptacao-pixabay.md](adaptacao-pixabay.md); nenhum serviço de produção foi
+alterado.

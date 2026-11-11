@@ -14,7 +14,7 @@ export async function verificarStorage(projectUrl, photos, { timeoutMs = 5000 } 
   if (!object(photos) || Object.keys(photos).length!==12) return {status:"blocked",checked:0,issues:[{field:"manifest"}]};
   for(const tag of expected){
     const image=photos[tag];
-    if(!object(image) || image.provider!=="pexels" || typeof image.sourceId!=="string" || !/^[1-9]\d*$/.test(image.sourceId) || ids.has(image.sourceId) || typeof image.sha256!=="string" || !/^[a-f0-9]{64}$/.test(image.sha256) || hashes.has(image.sha256) || image.bucket!=="equipment-images" || image.objectKey!==`empresti/${tag}/${image.sha256}.png` || image.width!==800 || image.height!==600) return {status:"blocked",checked:0,issues:[{assetTag:tag,field:"manifest"}]};
+    if(!object(image) || image.provider!=="pixabay" || typeof image.sourceId!=="string" || !/^[1-9]\d*$/.test(image.sourceId) || ids.has(image.sourceId) || typeof image.sha256!=="string" || !/^[a-f0-9]{64}$/.test(image.sha256) || hashes.has(image.sha256) || image.bucket!=="equipment-images" || image.objectKey!==`empresti/${tag}/${image.sha256}.png` || image.width!==800 || image.height!==600) return {status:"blocked",checked:0,issues:[{assetTag:tag,field:"manifest"}]};
     ids.add(image.sourceId);hashes.add(image.sha256);
   }
   const issues=[];let checked=0;

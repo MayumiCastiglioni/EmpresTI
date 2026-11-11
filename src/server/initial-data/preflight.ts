@@ -19,21 +19,24 @@ function object(value: unknown): value is JsonObject {
 }
 const imageKeys = ["provider", "sourceId", "sourceUrl", "photographer", "photographerUrl", "licenseUrl", "licenseCheckedAt", "bucket", "objectKey", "width", "height", "sha256"] as const;
 export type EquipmentImage = {
-  provider: "pexels"; sourceId: string; sourceUrl: string; photographer: string;
+  provider: "pixabay"; sourceId: string; sourceUrl: string; photographer: string;
   photographerUrl: string; licenseUrl: string; licenseCheckedAt: string;
   bucket: "equipment-images"; objectKey: string; width: 800; height: 600; sha256: string;
 };
-function pexelsUrl(value: unknown): boolean {
+function pixabayUrl(value: unknown, pathPrefix = "/"): boolean {
   if (typeof value !== "string") return false;
   try {
     const u = new URL(value);
-    return u.protocol === "https:" && ["pexels.com", "www.pexels.com"].includes(u.hostname) && !u.username && !u.password && !u.search && !u.hash && !u.port;
+    return u.protocol === "https:" && u.hostname === "pixabay.com" && !u.username && !u.password &&
+      !u.search && !u.hash && !u.port && u.pathname.length > 1 && u.pathname.startsWith(pathPrefix) &&
+      (pathPrefix !== "/users/" || /^\/users\/[^/]+\/?$/.test(u.pathname));
   } catch { return false; }
 }
 export function validImage(value: unknown, assetTag: string): value is EquipmentImage {
   if (!object(value) || Object.keys(value).length !== imageKeys.length || !imageKeys.every(k => Object.hasOwn(value, k))) return false;
-  return value.provider === "pexels" && typeof value.sourceId === "string" && /^[1-9]\d*$/.test(value.sourceId) &&
-    [value.sourceUrl, value.photographerUrl, value.licenseUrl].every(pexelsUrl) &&
+  return value.provider === "pixabay" && typeof value.sourceId === "string" && /^[1-9]\d*$/.test(value.sourceId) &&
+    pixabayUrl(value.sourceUrl) && pixabayUrl(value.photographerUrl, "/users/") &&
+    value.licenseUrl === "https://pixabay.com/service/license-summary/" &&
     typeof value.photographer === "string" && value.photographer.trim().length > 0 &&
     typeof value.licenseCheckedAt === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value.licenseCheckedAt) &&
     Number.isFinite(Date.parse(value.licenseCheckedAt)) && new Date(value.licenseCheckedAt).toISOString().slice(0,10) === value.licenseCheckedAt &&
