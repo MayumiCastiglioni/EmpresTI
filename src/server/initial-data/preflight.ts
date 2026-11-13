@@ -19,7 +19,7 @@ function object(value: unknown): value is JsonObject {
 }
 const imageKeys = ["provider", "sourceId", "sourceUrl", "photographer", "photographerUrl", "licenseUrl", "licenseCheckedAt", "bucket", "objectKey", "width", "height", "sha256"] as const;
 export type EquipmentImage = {
-  provider: "pixabay"; sourceId: string; sourceUrl: string; photographer: string;
+  provider: "pixabay" | "pexels" | "wikimedia"; sourceId: string; sourceUrl: string; photographer: string;
   photographerUrl: string; licenseUrl: string; licenseCheckedAt: string;
   bucket: "equipment-images"; objectKey: string; width: 800; height: 600; sha256: string;
 };
@@ -34,15 +34,45 @@ function pixabayUrl(value: unknown, pathPrefix = "/"): boolean {
 }
 export function validImage(value: unknown, assetTag: string): value is EquipmentImage {
   if (!object(value) || Object.keys(value).length !== imageKeys.length || !imageKeys.every(k => Object.hasOwn(value, k))) return false;
-  return value.provider === "pixabay" && typeof value.sourceId === "string" && /^[1-9]\d*$/.test(value.sourceId) &&
-    pixabayUrl(value.sourceUrl) && pixabayUrl(value.photographerUrl, "/users/") &&
-    value.licenseUrl === "https://pixabay.com/service/license-summary/" &&
+  return validSource(value) &&
     typeof value.photographer === "string" && value.photographer.trim().length > 0 &&
     typeof value.licenseCheckedAt === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value.licenseCheckedAt) &&
     Number.isFinite(Date.parse(value.licenseCheckedAt)) && new Date(value.licenseCheckedAt).toISOString().slice(0,10) === value.licenseCheckedAt &&
     value.width === 800 && value.height === 600 && value.bucket === "equipment-images" &&
     typeof value.sha256 === "string" && /^[a-f0-9]{64}$/.test(value.sha256) &&
     value.objectKey === `empresti/${assetTag}/${value.sha256}.png`;
+}
+
+function sourceUrl(value: unknown, hostname: string, prefix: string): boolean {
+  if (typeof value !== "string") return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.hostname === hostname && !url.username &&
+      !url.password && !url.port && !url.search && !url.hash &&
+      url.pathname.startsWith(prefix) && url.pathname.length > prefix.length;
+  } catch { return false; }
+}
+
+function validSource(value: JsonObject): boolean {
+  if (typeof value.sourceId !== "string" || !value.sourceId.trim()) return false;
+  if (value.provider === "pixabay") {
+    return /^[1-9]\d*$/.test(value.sourceId) && pixabayUrl(value.sourceUrl) &&
+      pixabayUrl(value.photographerUrl, "/users/") &&
+      value.licenseUrl === "https://pixabay.com/service/license-summary/";
+  }
+  if (value.provider === "pexels") {
+    return /^[1-9]\d*$/.test(value.sourceId) &&
+      sourceUrl(value.sourceUrl, "www.pexels.com", "/photo/") &&
+      (sourceUrl(value.photographerUrl, "www.pexels.com", "/photo/") ||
+       sourceUrl(value.photographerUrl, "www.pexels.com", "/@")) &&
+      ["https://www.pexels.com/license/", "https://www.pexels.com/legal-pages/license/"].includes(String(value.licenseUrl));
+  }
+  if (value.provider === "wikimedia") {
+    return sourceUrl(value.sourceUrl, "commons.wikimedia.org", "/wiki/File:") &&
+      sourceUrl(value.photographerUrl, "commons.wikimedia.org", "/wiki/User:") &&
+      ["https://creativecommons.org/publicdomain/mark/1.0/", "https://creativecommons.org/publicdomain/zero/1.0/"].includes(String(value.licenseUrl));
+  }
+  return false;
 }
 export type ExistingEquipment = {
   assetTag: string; name: string; category: string; status: string; image: unknown;
@@ -64,8 +94,9 @@ export function preflightEquipment(photos: unknown, existing: readonly ExistingE
   for (const [assetTag, name, category, status] of initialEquipment) {
     const image = photos[assetTag];
     if (!validImage(image, assetTag)) { report.issues.push({ assetTag, field: "image" }); continue; }
-    if (ids.has(image.sourceId) || hashes.has(image.sha256)) report.issues.push({ assetTag, field: "duplicate-photo" });
-    ids.add(image.sourceId); hashes.add(image.sha256);
+    const sourceIdentity = `${image.provider}:${image.sourceId}`;
+    if (ids.has(sourceIdentity) || hashes.has(image.sha256)) report.issues.push({ assetTag, field: "duplicate-photo" });
+    ids.add(sourceIdentity); hashes.add(image.sha256);
     const matches = existing.filter(e => e.assetTag === assetTag);
     if (matches.length > 1) { report.issues.push({ assetTag, field: "duplicate-equipment" }); continue; }
     const current = matches[0];
